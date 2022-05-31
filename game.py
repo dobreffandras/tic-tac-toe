@@ -1,6 +1,7 @@
 from game_engine import GameEngine, GameState
 from tkinter import Tk, Button
 
+
 class Game(Tk):
     def __init__(self):
         super().__init__()
@@ -9,7 +10,7 @@ class Game(Tk):
         self.config(width=800, height=600)
 
     def gamestate_change_handler(self, game_state: GameState):
-        if(game_state == GameState.PLAYING):
+        if game_state == GameState.PLAYING:
             Game.Playing(self)
 
     def launch(self):
@@ -28,13 +29,14 @@ class Game(Tk):
             for r, c in self.indexes:
                 text = f"Button ({r},{c})"
                 btn = Button(self.tk_root, text=text, command=self.create_button_command(r, c))
-                self.playfield_buttons[(r,c)] = btn
-    
+                self.playfield_buttons[(r, c)] = btn
+
         def create_button_command(self, r, c):
             def command():
-                print(r,c)
+                print(r, c)
+
             return command
-        
+
         def layout_controls(self):
             for key, btn in self.playfield_buttons.items():
                 r, c = key
