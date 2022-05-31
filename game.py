@@ -1,5 +1,5 @@
-from game_engine import GameEngine, GameState
-from tkinter import Tk, Button
+from game_engine import GameEngine, GameState, GamePlayState
+from tkinter import Tk, Button, NORMAL, DISABLED
 
 
 class Game(Tk):
@@ -34,8 +34,7 @@ class Game(Tk):
 
         def setup_controls(self):
             for r, c in self.indexes:
-                text = f"Button ({r},{c})"
-                btn = Button(self.tk_root, text=text, command=self.create_button_command(r, c))
+                btn = Button(self.tk_root, text="-", command=self.create_button_command(r, c))
                 self.playfield_buttons[(r, c)] = btn
 
         def create_button_command(self, r, c):
@@ -48,8 +47,13 @@ class Game(Tk):
             for key, btn in self.playfield_buttons.items():
                 r, c = key
                 btn.grid(row=r, column=c)
-        def playing_state_changed(self, state):
+        def playing_state_changed(self, state: GamePlayState):
             print("New State:", str(state))
+            for key, btn in self.playfield_buttons.items():
+                item = state.board[key]
+                btn_state = NORMAL if item is None else DISABLED
+                btn_text = item if item else "-"
+                btn.config(text = btn_text, state = btn_state)
 
     class Start:
         def __init__(self, tk_root, engine: GameEngine):

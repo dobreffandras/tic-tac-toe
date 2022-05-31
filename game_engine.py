@@ -24,7 +24,7 @@ class GameEngine:
         self.playing_state.add_sign_to((r,c), self.player_sign)
         self.playing_state_listener(self.playing_state)
 
-    def connect_playing_state_change_handler(self, playing_state_listener : Callable[[object], None]):
+    def connect_playing_state_change_handler(self, playing_state_listener : Callable[[object], None]): # TODO fix object
         self.playing_state_listener = playing_state_listener
 
 
@@ -65,6 +65,8 @@ BOARD:
 |{b[(1, 0)]}|{b[(1, 1)]}|{b[(1, 2)]}|\n\
 |{b[(2, 0)]}|{b[(2, 1)]}|{b[(2, 2)]}|\n\
 -------"
+        def __getitem__(self, key: tuple[int, int]):
+            return self.board[key[0]][key[1]]
 
         def __setitem__(self, key: tuple[int, int], value):
             self.board[key[0]][key[1]] = value
