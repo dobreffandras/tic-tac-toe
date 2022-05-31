@@ -13,9 +13,14 @@ class Game(Tk):
     def setup_controls(self):
         for r, c in self.indexes:
             text = f"Button ({r},{c})"
-            btn = Button(self, text=text)
+            btn = Button(self, text=text, command=self.create_button_command(r, c))
             self.playfield_buttons[(r,c)] = btn
     
+    def create_button_command(self, r, c):
+        def command():
+            print(r,c)
+        return command
+        
     def layout_controls(self):
         for key, btn in self.playfield_buttons.items():
             r, c = key
