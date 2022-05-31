@@ -26,6 +26,7 @@ class Game(Tk):
         def __init__(self, tk_root, engine: GameEngine):
             self.tk_root = tk_root
             self.engine = engine
+            self.engine.connect_playing_state_change_handler(self.playing_state_changed)
             self.playfield_buttons = {}
             self.indexes = [(r, c) for r in range(3) for c in range(3)]
             self.setup_controls()
@@ -46,6 +47,8 @@ class Game(Tk):
             for key, btn in self.playfield_buttons.items():
                 r, c = key
                 btn.grid(row=r, column=c)
+        def playing_state_changed(self, state):
+            print("New State:", state)
 
     class Start:
         def __init__(self, tk_root, engine: GameEngine):
