@@ -1,8 +1,10 @@
+from game_engine import GameEngine, GameState
 from tkinter import Tk, Button
 
 class Game(Tk):
     def __init__(self):
         super().__init__()
+        self.game_engine = GameEngine(self.gamestate_change_handler)
         self.playfield_buttons = {}
         self.indexes = [(r, c) for r in range(3) for c in range(3)]
         self.title("Tic tac toe")
@@ -25,6 +27,10 @@ class Game(Tk):
         for key, btn in self.playfield_buttons.items():
             r, c = key
             btn.grid(row=r, column=c)
-            
+
+    def gamestate_change_handler(self, game_state: GameState):
+        print(game_state)
+
     def launch(self):
+        self.game_engine.launch()
         self.mainloop()
