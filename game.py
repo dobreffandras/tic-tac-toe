@@ -48,7 +48,7 @@ class Game(Tk):
                 r, c = key
                 btn.grid(row=r, column=c)
         def playing_state_changed(self, state):
-            print("New State:", state)
+            print("New State:", str(state))
 
     class Start:
         def __init__(self, tk_root, engine: GameEngine):
