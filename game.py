@@ -16,15 +16,16 @@ class Game(Tk):
         if game_state == GameState.START:
             Game.Start(self, self.game_engine)
         if game_state == GameState.PLAYING:
-            Game.Playing(self)
+            Game.Playing(self, self.game_engine)
 
     def launch(self):
         self.game_engine.launch()
         self.mainloop()
 
     class Playing:
-        def __init__(self, tk_root):
+        def __init__(self, tk_root, engine: GameEngine):
             self.tk_root = tk_root
+            self.engine = engine
             self.playfield_buttons = {}
             self.indexes = [(r, c) for r in range(3) for c in range(3)]
             self.setup_controls()
@@ -38,8 +39,7 @@ class Game(Tk):
 
         def create_button_command(self, r, c):
             def command():
-                print(r, c)
-
+                self.engine.player_chooses(r,c)
             return command
 
         def layout_controls(self):

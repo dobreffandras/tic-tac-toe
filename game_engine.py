@@ -17,3 +17,6 @@ class GameEngine:
 
     def start_playing(self):
         self.listener(GameState.PLAYING)
+
+    def player_chooses(self, r, c):
+        print("Player Chooses", r, c)
