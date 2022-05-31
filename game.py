@@ -47,6 +47,7 @@ class Game(Tk):
             for key, btn in self.playfield_buttons.items():
                 r, c = key
                 btn.grid(row=r, column=c)
+
         def playing_state_changed(self, state: GamePlayState):
             print("New State:", str(state))
             for key, btn in self.playfield_buttons.items():
