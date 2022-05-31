@@ -10,4 +10,4 @@ class GameEngine:
     def __init__(self, gamestate_listener: Callable[GameState]):
         self.listener = gamestate_listener
     def launch(self):
-        self.listener(GameState.START)
+        self.listener(GameState.PLAYING)
