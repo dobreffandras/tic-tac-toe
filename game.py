@@ -40,6 +40,7 @@ class Game(Tk):
 
         def create_button_command(self, r, c):
             def command():
+                print("Player Chooses", r, c)
                 self.engine.player_chooses(r,c)
             return command
 

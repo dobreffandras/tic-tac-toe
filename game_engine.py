@@ -21,7 +21,6 @@ class GameEngine:
         self.listener(GameState.PLAYING)
 
     def player_chooses(self, r, c):
-        print("Player Chooses", r, c)
         self.playing_state.add_sign_to((r,c), self.player_sign)
         self.playing_state_listener(self.playing_state)
 
