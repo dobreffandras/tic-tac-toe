@@ -10,6 +10,11 @@ class Game(Tk):
         self.config(width=800, height=600)
 
     def gamestate_change_handler(self, game_state: GameState):
+        for child in self.winfo_children():
+            child.destroy()
+
+        if game_state == GameState.START:
+            Game.Start(self, self.game_engine)
         if game_state == GameState.PLAYING:
             Game.Playing(self)
 
@@ -41,3 +46,18 @@ class Game(Tk):
             for key, btn in self.playfield_buttons.items():
                 r, c = key
                 btn.grid(row=r, column=c)
+
+    class Start:
+        def __init__(self, tk_root, engine: GameEngine):
+            self.tk_root = tk_root
+            self.engine = engine
+            self.setup_controls()
+            self.layout_controls()
+
+        def setup_controls(self):
+            self.game_start_button = Button(self.tk_root,
+                                            text="Start Game",
+                                            command=self.engine.start_playing)
+
+        def layout_controls(self):
+            self.game_start_button.pack()

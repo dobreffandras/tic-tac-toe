@@ -13,4 +13,7 @@ class GameEngine:
         self.listener = gamestate_listener
 
     def launch(self):
+        self.listener(GameState.START)
+
+    def start_playing(self):
         self.listener(GameState.PLAYING)
