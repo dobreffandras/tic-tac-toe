@@ -38,7 +38,7 @@ class Game(Tk):
             for r, c in self.indexes:
                 btn = Button(self.playfield, text="-", command=self.create_button_command(r, c))
                 self.playfield_buttons[(r, c)] = btn
-            self.on_turn_text_field = Label(self.tk_root, text="Your turn")
+            self.on_turn_text_field = Label(self.tk_root, text="It's your turn.")
 
         def create_button_command(self, r, c):
             def command():
@@ -57,6 +57,8 @@ class Game(Tk):
         def playing_state_changed(self, state: GamePlayState):
             print("New State:", str(state))
             is_player_on_turn = state.turn is GamePlayState.GameTurn.PLAYER
+            on_turn_text = "It's your turn." if is_player_on_turn else "Opponent is on turn."
+            self.on_turn_text_field.config(text=on_turn_text) # TODO introduce TK control variables variables
             for key, btn in self.playfield_buttons.items():
                 item = state.board[key]
                 is_btn_clickable = is_player_on_turn and item is None
