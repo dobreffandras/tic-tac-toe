@@ -1,6 +1,6 @@
 from game_engine import GameEngine, GameState
 from game_play_state import GamePlayState
-from tkinter import Tk, Button, NORMAL, DISABLED
+from tkinter import Tk, Frame, Label, Button, NORMAL, DISABLED
 
 
 class Game(Tk):
@@ -34,9 +34,11 @@ class Game(Tk):
             self.layout_controls()
 
         def setup_controls(self):
+            self.playfield = Frame(self.tk_root)
             for r, c in self.indexes:
-                btn = Button(self.tk_root, text="-", command=self.create_button_command(r, c))
+                btn = Button(self.playfield, text="-", command=self.create_button_command(r, c))
                 self.playfield_buttons[(r, c)] = btn
+            self.on_turn_text_field = Label(self.tk_root, text="Your turn")
 
         def create_button_command(self, r, c):
             def command():
@@ -46,15 +48,19 @@ class Game(Tk):
             return command
 
         def layout_controls(self):
+            self.playfield.pack()
+            self.on_turn_text_field.pack()
             for key, btn in self.playfield_buttons.items():
                 r, c = key
                 btn.grid(row=r, column=c)
 
         def playing_state_changed(self, state: GamePlayState):
             print("New State:", str(state))
+            is_player_on_turn = state.turn is GamePlayState.GameTurn.PLAYER
             for key, btn in self.playfield_buttons.items():
                 item = state.board[key]
-                btn_state = NORMAL if item is None else DISABLED
+                is_btn_clickable = is_player_on_turn and item is None
+                btn_state = NORMAL if is_btn_clickable else DISABLED
                 btn_text = item if item else "-"
                 btn.config(text=btn_text, state=btn_state)
 
