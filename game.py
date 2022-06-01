@@ -1,4 +1,5 @@
-from game_engine import GameEngine, GameState, GamePlayState
+from game_engine import GameEngine, GameState
+from game_play_state import GamePlayState
 from tkinter import Tk, Button, NORMAL, DISABLED
 
 
