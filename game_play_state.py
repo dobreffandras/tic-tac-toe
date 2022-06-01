@@ -31,7 +31,7 @@ BOARD:
             def to_char(b):
                 return b if b is not None else "-"
 
-            b = {(r, c): to_char(self.board[r][c]) for r in range(3) for c in range(3)}
+            b = {(r, c): to_char(x) for ((r, c), x) in self.items()}
 
             return f"-------\n\
 |{b[(0, 0)]}|{b[(0, 1)]}|{b[(0, 2)]}|\n\
@@ -44,6 +44,9 @@ BOARD:
 
         def __setitem__(self, key: tuple[int, int], value):
             self.board[key[0]][key[1]] = value
+
+        def items(self):
+            return [((r, c), self.board[r][c]) for r in range(3) for c in range(3)]
 
     def change_turn(self, turn: GameTurn):
         self.turn = turn
