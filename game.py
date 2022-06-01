@@ -1,6 +1,6 @@
 from game_engine import GameEngine, GameState
 from game_play_state import GamePlayState
-from tkinter import Tk, Frame, Label, Button, PhotoImage, NORMAL, DISABLED
+from tkinter import Tk, Frame, Label, Button, PhotoImage, NORMAL, DISABLED, CENTER
 import threading
 
 
@@ -9,7 +9,7 @@ class Game(Tk):
         super().__init__()
         self.game_engine = GameEngine(self.gamestate_change_handler)
         self.title("Tic tac toe")
-        self.config(width=800, height=600)
+        self.geometry("250x320")
 
     def gamestate_change_handler(self, game_state: GameState):
         for child in self.winfo_children():
@@ -57,7 +57,7 @@ class Game(Tk):
             return lambda: t.start()
 
         def layout_controls(self):
-            self.playfield.pack()
+            self.playfield.pack(padx=20, pady=20)
             self.on_turn_text_field.pack()
             for key, btn in self.playfield_buttons.items():
                 r, c = key
@@ -88,4 +88,4 @@ class Game(Tk):
                                             command=self.engine.start_playing)
 
         def layout_controls(self):
-            self.game_start_button.pack()
+            self.game_start_button.place(anchor=CENTER, relx=0.5, rely=0.5)
