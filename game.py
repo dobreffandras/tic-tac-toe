@@ -1,6 +1,6 @@
 from game_engine import GameEngine, GameState
 from game_play_state import GamePlayState
-from tkinter import Tk, Frame, Label, Button, NORMAL, DISABLED
+from tkinter import Tk, Frame, Label, Button, PhotoImage, NORMAL, DISABLED
 import threading
 
 
@@ -35,9 +35,16 @@ class Game(Tk):
             self.layout_controls()
 
         def setup_controls(self):
+            self.images = {
+                "CIRCLE": PhotoImage(file=r"images\circle.png", width=64, height=64),
+                "CROSS": PhotoImage(file=r"images\cross.png", width=64, height=64),
+                "EMPTY": PhotoImage(file=r"images\empty.png", width=64, height=64)
+            }
             self.playfield = Frame(self.tk_root)
             for r, c in self.indexes:
-                btn = Button(self.playfield, text="-", command=self.create_button_command(r, c))
+                btn = Button(self.playfield,
+                             image=self.images["EMPTY"],
+                             command=self.create_button_command(r, c))
                 self.playfield_buttons[(r, c)] = btn
             self.on_turn_text_field = Label(self.tk_root, text="It's your turn.")
 
@@ -65,8 +72,8 @@ class Game(Tk):
                 item = state.board[key]
                 is_btn_clickable = is_player_on_turn and item is None
                 btn_state = NORMAL if is_btn_clickable else DISABLED
-                btn_text = item if item else "-"
-                btn.config(text=btn_text, state=btn_state)
+                btn_image = "CROSS" if item == "X" else "CIRCLE" if item == "O" else "EMPTY"
+                btn.config(image=self.images[btn_image], state=btn_state)
 
     class Start:
         def __init__(self, tk_root, engine: GameEngine):
