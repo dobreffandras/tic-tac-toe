@@ -13,8 +13,8 @@ class GameState(Enum):
 class GameEngine:
     def __init__(self, gamestate_listener: Callable[[GameState], None]):
         self.playing_state_listener = None
-        self.player_sign = "X"  # TODO Player may choose to be Player2 instead later
-        self.computer_player_sign = "O"
+        self.player_sign = None
+        self.computer_player_sign = None
         self.listener = gamestate_listener
         self.playing_state = GamePlayState()
         self.gameover_state = None
@@ -23,7 +23,9 @@ class GameEngine:
     def launch(self):
         self.listener(GameState.START)
 
-    def start_playing(self):
+    def start_playing(self, player_sign: str):
+        self.player_sign = player_sign
+        self.computer_player_sign = "O" if player_sign == "X" else "X"
         self.listener(GameState.PLAYING)
 
     def player_chooses(self, r, c):
