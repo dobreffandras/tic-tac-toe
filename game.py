@@ -108,6 +108,7 @@ class Game(Tk):
             self.images = {}
             self.playfield = None
             self.playfield_buttons = {}
+            self.restart_button = None
             self.engine = engine
             self.setup_controls()
             self.layout_controls()
@@ -131,12 +132,14 @@ class Game(Tk):
             winner_sign = self.engine.gameover_state["winner"]
             game_over_text = f"Game over. {winner_sign} wins." if winner_sign else "Game over. It's a tie."
             self.game_over_label = Label(self.tk_root, font=("Courier", "12", "bold"), text=game_over_text)
+            self.restart_button = Button(self.tk_root, text="Restart", command=self.engine.restart)
 
         def none_command(self): ...
 
         def layout_controls(self):
             self.playfield.pack(padx=20, pady=20)
             self.game_over_label.pack(ipadx=3, ipady=3)
+            self.restart_button.pack()
             for key, btn in self.playfield_buttons.items():
                 r, c = key
                 btn.grid(row=r, column=c)

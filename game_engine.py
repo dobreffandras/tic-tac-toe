@@ -53,3 +53,8 @@ class GameEngine:
 
     def connect_playing_state_change_handler(self, playing_state_listener: Callable[[GamePlayState], None]):
         self.playing_state_listener = playing_state_listener
+
+    def restart(self):
+        self.playing_state = GamePlayState()
+        self.gameover_state = None
+        self.listener(GameState.PLAYING)
