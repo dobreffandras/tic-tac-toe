@@ -46,7 +46,10 @@ class Game(Tk):
                              image=self.images["EMPTY"],
                              command=self.create_button_command(r, c))
                 self.playfield_buttons[(r, c)] = btn
-            self.on_turn_text_field = Label(self.tk_root, text="It's your turn.")
+            self.on_turn_text_field = Label(self.tk_root,
+                                            text="It's your turn.",
+                                            font=("Courier","12", "bold"),
+                                            bg="#0F0")
 
         def create_button_command(self, r, c):
             def command():
@@ -58,7 +61,7 @@ class Game(Tk):
 
         def layout_controls(self):
             self.playfield.pack(padx=20, pady=20)
-            self.on_turn_text_field.pack()
+            self.on_turn_text_field.pack(ipadx=3, ipady=3)
             for key, btn in self.playfield_buttons.items():
                 r, c = key
                 btn.grid(row=r, column=c)
@@ -66,8 +69,10 @@ class Game(Tk):
         def playing_state_changed(self, state: GamePlayState):
             print("New State:", str(state))
             is_player_on_turn = state.turn is GamePlayState.GameTurn.PLAYER
-            on_turn_text = "It's your turn." if is_player_on_turn else "Opponent is on turn."
-            self.on_turn_text_field.config(text=on_turn_text) # TODO introduce TK control variables variables
+            on_player_turn = dict(text = "It's your turn.", font=("Courier","12", "bold"), bg="#0F0")
+            on_computer_turn = dict(text = "Opponent is on turn.", font=("Courier","12", "bold"), bg="#FFA500")
+            on_turn_config = on_player_turn if is_player_on_turn else on_computer_turn
+            self.on_turn_text_field.config(**on_turn_config)
             for key, btn in self.playfield_buttons.items():
                 item = state.board[key]
                 is_btn_clickable = is_player_on_turn and item is None
