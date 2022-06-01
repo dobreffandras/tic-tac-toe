@@ -57,4 +57,4 @@ class GameEngine:
     def restart(self):
         self.playing_state = GamePlayState()
         self.gameover_state = None
-        self.listener(GameState.PLAYING)
+        self.listener(GameState.START)
