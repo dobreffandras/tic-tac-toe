@@ -1,6 +1,7 @@
 from game_engine import GameEngine, GameState
 from game_play_state import GamePlayState
 from tkinter import Tk, Frame, Label, Button, NORMAL, DISABLED
+import threading
 
 
 class Game(Tk):
@@ -45,7 +46,8 @@ class Game(Tk):
                 print("Player Chooses", r, c)
                 self.engine.player_chooses(r, c)
 
-            return command
+            t = threading.Thread(target=command)
+            return lambda: t.start()
 
         def layout_controls(self):
             self.playfield.pack()
