@@ -138,8 +138,9 @@ class Game(Tk):
 
         def layout_controls(self):
             self.playfield.pack(padx=20, pady=20)
-            self.game_over_label.pack(ipadx=3, ipady=3)
-            self.restart_button.pack()
             for key, btn in self.playfield_buttons.items():
                 r, c = key
                 btn.grid(row=r, column=c)
+
+            self.game_over_label.pack(ipadx=3, ipady=3)
+            self.restart_button.pack()
