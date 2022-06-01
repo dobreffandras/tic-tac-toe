@@ -40,7 +40,8 @@ class Game(Tk):
         def create_button_command(self, r, c):
             def command():
                 print("Player Chooses", r, c)
-                self.engine.player_chooses(r,c)
+                self.engine.player_chooses(r, c)
+
             return command
 
         def layout_controls(self):
@@ -54,7 +55,7 @@ class Game(Tk):
                 item = state.board[key]
                 btn_state = NORMAL if item is None else DISABLED
                 btn_text = item if item else "-"
-                btn.config(text = btn_text, state = btn_state)
+                btn.config(text=btn_text, state=btn_state)
 
     class Start:
         def __init__(self, tk_root, engine: GameEngine):
