@@ -57,5 +57,38 @@ BOARD:
 
     def is_gameover(self):
         def does_someone_win():
-            return False
+            def signs_in_a_row():
+                is_row1 = self.board[(0, 0)] == self.board[(0, 1)] \
+                          and self.board[(0, 1)] == self.board[(0, 2)]\
+                          and self.board[(0, 0)] # Not all is None
+                is_row2 = self.board[(1, 0)] == self.board[(1, 1)] \
+                          and self.board[(1, 1)] == self.board[(1, 2)]\
+                          and self.board[(1, 1)] # Not all is None
+                is_row3 = self.board[(2, 0)] == self.board[(2, 1)] \
+                          and self.board[(2, 1)] == self.board[(2, 2)]\
+                          and self.board[(2, 2)]  # Not all is None
+                return is_row1 or is_row2 or is_row3
+
+            def signs_in_a_column():
+                is_col1 = self.board[(0, 0)] == self.board[(1, 0)] \
+                          and self.board[(1, 0)] == self.board[(2, 0)]\
+                          and self.board[(0, 0)] # Not all is None
+                is_col2 = self.board[(0, 1)] == self.board[(1, 1)] \
+                          and self.board[(1, 1)] == self.board[(2, 1)]\
+                          and self.board[(1, 1)] # Not all is None
+                is_col3 = self.board[(0, 2)] == self.board[(1, 2)] \
+                          and self.board[(1, 2)] == self.board[(2, 2)]\
+                          and self.board[(2, 2)]  # Not all is None
+                return is_col1 or is_col2 or is_col3
+
+            def signs_in_a_diagonal():
+                is_d1 = self.board[(0,0)] == self.board[(1,1)] \
+                        and self.board[(1,1)] == self.board[(2,2)] \
+                        and self.board[(1,1)] # Not all is None
+                is_d2 = self.board[(0, 2)] == self.board[(1, 1)] \
+                        and self.board[(1, 1)] == self.board[(2, 0)] \
+                        and self.board[(1, 1)]  # Not all is None
+                return is_d1 or is_d2
+
+            return signs_in_a_row() or signs_in_a_column() or signs_in_a_diagonal()
         return does_someone_win() or self.board.is_full()
