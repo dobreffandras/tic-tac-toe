@@ -1,4 +1,5 @@
 from enum import Enum
+import itertools
 
 
 class GamePlayState:
@@ -48,5 +49,13 @@ BOARD:
         def items(self):
             return [((r, c), self.board[r][c]) for r in range(3) for c in range(3)]
 
+        def is_full(self):
+            return all(itertools.chain(*self.board))
+
     def change_turn(self, turn: GameTurn):
         self.turn = turn
+
+    def is_gameover(self):
+        def does_someone_win():
+            return False
+        return does_someone_win() or self.board.is_full()

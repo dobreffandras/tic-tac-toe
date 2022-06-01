@@ -19,6 +19,8 @@ class Game(Tk):
             Game.Start(self, self.game_engine)
         if game_state == GameState.PLAYING:
             Game.Playing(self, self.game_engine)
+        if game_state == GameState.GAMEOVER:
+            Game.GameOver(self, self.game_engine)
 
     def launch(self):
         self.game_engine.launch()
@@ -94,3 +96,16 @@ class Game(Tk):
 
         def layout_controls(self):
             self.game_start_button.place(anchor=CENTER, relx=0.5, rely=0.5)
+
+    class GameOver:
+        def __init__(self, tk_root, engine: GameEngine):
+            self.tk_root = tk_root
+            self.engine = engine
+            self.setup_controls()
+            self.layout_controls()
+
+        def setup_controls(self):
+            self.game_over_text = Label(self.tk_root, text="Game over")
+
+        def layout_controls(self):
+            self.game_over_text.place(anchor=CENTER, relx=0.5, rely=0.5)
