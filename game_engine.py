@@ -30,7 +30,7 @@ class GameEngine:
         # Receive players move
         self.playing_state.add_sign_to((r, c), self.player_sign)
         if winner_sign := self.playing_state.is_gameover():
-            self.gameover_state = {"board": self.playing_state.board.items()}
+            self.gameover_state = {"board": self.playing_state.board.items(), "winner": winner_sign}
             self.listener(GameState.GAMEOVER)
             return
         else:
@@ -44,7 +44,7 @@ class GameEngine:
         (c_r, c_c) = self.computer_player.next_move(self.playing_state.board)
         self.playing_state.add_sign_to((c_r, c_c), self.computer_player_sign)
         if winner_sign := self.playing_state.is_gameover():
-            self.gameover_state = {"board": self.playing_state.board.items()}
+            self.gameover_state = {"board": self.playing_state.board.items(), "winner": winner_sign}
             self.listener(GameState.GAMEOVER)
             return
         else:

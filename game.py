@@ -103,7 +103,7 @@ class Game(Tk):
 
     class GameOver:
         def __init__(self, tk_root, engine: GameEngine):
-            self.game_over_text = None
+            self.game_over_label = None
             self.tk_root = tk_root
             self.images = {}
             self.playfield = None
@@ -128,13 +128,15 @@ class Game(Tk):
                              state=DISABLED,
                              command=self.none_command) # somehow tkinter button breaks without a command
                 self.playfield_buttons[(r, c)] = btn
-            self.game_over_text = Label(self.tk_root, text="Game over")
+            winner_sign = self.engine.gameover_state["winner"]
+            game_over_text = f"Game over. {winner_sign} wins." if winner_sign else "Game over. It's a tie."
+            self.game_over_label = Label(self.tk_root, font=("Courier", "12", "bold"), text=game_over_text)
 
         def none_command(self): ...
 
         def layout_controls(self):
             self.playfield.pack(padx=20, pady=20)
-            self.game_over_text.pack(ipadx=3, ipady=3)
+            self.game_over_label.pack(ipadx=3, ipady=3)
             for key, btn in self.playfield_buttons.items():
                 r, c = key
                 btn.grid(row=r, column=c)
