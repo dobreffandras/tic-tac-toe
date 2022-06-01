@@ -124,9 +124,13 @@ class Game(Tk):
             for ((r, c), item) in self.engine.gameover_state["board"]:
                 btn_image = "CROSS" if item == "X" else "CIRCLE" if item == "O" else "EMPTY"
                 btn = Button(self.playfield,
-                             image=self.images[btn_image])
+                             image=self.images[btn_image],
+                             state=DISABLED,
+                             command=self.none_command) # somehow tkinter button breaks without a command
                 self.playfield_buttons[(r, c)] = btn
             self.game_over_text = Label(self.tk_root, text="Game over")
+
+        def none_command(self): ...
 
         def layout_controls(self):
             self.playfield.pack(padx=20, pady=20)
