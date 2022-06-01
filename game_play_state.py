@@ -4,7 +4,7 @@ import itertools
 
 class GamePlayState:
     def __init__(self):
-        self.turn: GamePlayState.GameTurn = GamePlayState.GameTurn.PLAYER  # TODO Player may choose to be Player2 instead later
+        self.turn: GamePlayState.GameTurn = GamePlayState.GameTurn.PLAYER
         self.board: GamePlayState.GameBoard = GamePlayState.GameBoard()
 
     def __str__(self):

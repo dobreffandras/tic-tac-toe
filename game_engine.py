@@ -28,6 +28,14 @@ class GameEngine:
         self.computer_player_sign = "O" if player_sign == "X" else "X"
         self.listener(GameState.PLAYING)
 
+        if(self.computer_player_sign == "X"):
+            self.playing_state.change_turn(GamePlayState.GameTurn.COMPUTER) # TODO This has to be initial
+            self.playing_state_listener(self.playing_state)
+            (c_r, c_c) = self.computer_player.next_move(self.playing_state.board)
+            self.playing_state.add_sign_to((c_r, c_c), self.computer_player_sign)
+            self.playing_state.change_turn(GamePlayState.GameTurn.PLAYER)
+            self.playing_state_listener(self.playing_state)
+
     def player_chooses(self, r, c):
         # Receive players move
         self.playing_state.add_sign_to((r, c), self.player_sign)
@@ -57,6 +65,6 @@ class GameEngine:
         self.playing_state_listener = playing_state_listener
 
     def restart(self):
-        self.playing_state = GamePlayState()
+        self.playing_state = GamePlayState() # TODO This has to be set only after navigation with a default initial player
         self.gameover_state = None
         self.listener(GameState.START)
