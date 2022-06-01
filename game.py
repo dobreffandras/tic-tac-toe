@@ -40,7 +40,7 @@ class Game(Tk):
             self.layout_controls()
 
         def setup_controls(self):
-            self.images = {
+            self.images = { # TODO move to Game classvar
                 "CIRCLE": PhotoImage(file=r"images\circle.png", width=64, height=64),
                 "CROSS": PhotoImage(file=r"images\cross.png", width=64, height=64),
                 "EMPTY": PhotoImage(file=r"images\empty.png", width=64, height=64)
@@ -105,12 +105,32 @@ class Game(Tk):
         def __init__(self, tk_root, engine: GameEngine):
             self.game_over_text = None
             self.tk_root = tk_root
+            self.images = {}
+            self.playfield = None
+            self.playfield_buttons = {}
             self.engine = engine
             self.setup_controls()
             self.layout_controls()
 
         def setup_controls(self):
+            self.images = {  # TODO move to Game classvar
+                "CIRCLE": PhotoImage(file=r"images\circle.png", width=64, height=64),
+                "CROSS": PhotoImage(file=r"images\cross.png", width=64, height=64),
+                "EMPTY": PhotoImage(file=r"images\empty.png", width=64, height=64)
+            }
+
+            self.playfield = Frame(self.tk_root)
+
+            for ((r, c), item) in self.engine.gameover_state["board"]:
+                btn_image = "CROSS" if item == "X" else "CIRCLE" if item == "O" else "EMPTY"
+                btn = Button(self.playfield,
+                             image=self.images[btn_image])
+                self.playfield_buttons[(r, c)] = btn
             self.game_over_text = Label(self.tk_root, text="Game over")
 
         def layout_controls(self):
-            self.game_over_text.place(anchor=CENTER, relx=0.5, rely=0.5)
+            self.playfield.pack(padx=20, pady=20)
+            self.game_over_text.pack(ipadx=3, ipady=3)
+            for key, btn in self.playfield_buttons.items():
+                r, c = key
+                btn.grid(row=r, column=c)

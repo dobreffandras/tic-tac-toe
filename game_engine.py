@@ -17,6 +17,7 @@ class GameEngine:
         self.computer_player_sign = "O"
         self.listener = gamestate_listener
         self.playing_state = GamePlayState()
+        self.gameover_state = None
         self.computer_player = ComputerPlayer()
 
     def launch(self):
@@ -28,7 +29,8 @@ class GameEngine:
     def player_chooses(self, r, c):
         # Receive players move
         self.playing_state.add_sign_to((r, c), self.player_sign)
-        if self.playing_state.is_gameover():
+        if winner_sign := self.playing_state.is_gameover():
+            self.gameover_state = {"board": self.playing_state.board.items()}
             self.listener(GameState.GAMEOVER)
             return
         else:
@@ -41,7 +43,8 @@ class GameEngine:
         # Receive computers move and change active player to player
         (c_r, c_c) = self.computer_player.next_move(self.playing_state.board)
         self.playing_state.add_sign_to((c_r, c_c), self.computer_player_sign)
-        if self.playing_state.is_gameover():
+        if winner_sign := self.playing_state.is_gameover():
+            self.gameover_state = {"board": self.playing_state.board.items()}
             self.listener(GameState.GAMEOVER)
             return
         else:
