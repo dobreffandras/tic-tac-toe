@@ -33,6 +33,9 @@ class Game(Tk):
             self.engine.connect_playing_state_change_handler(self.playing_state_changed)
             self.playfield_buttons = {}
             self.indexes = [(r, c) for r in range(3) for c in range(3)]
+            self.images = {}
+            self.playfield = None
+            self.on_turn_text_field = None
             self.setup_controls()
             self.layout_controls()
 
@@ -84,6 +87,7 @@ class Game(Tk):
 
     class Start:
         def __init__(self, tk_root, engine: GameEngine):
+            self.game_start_button = None
             self.tk_root = tk_root
             self.engine = engine
             self.setup_controls()
@@ -99,6 +103,7 @@ class Game(Tk):
 
     class GameOver:
         def __init__(self, tk_root, engine: GameEngine):
+            self.game_over_text = None
             self.tk_root = tk_root
             self.engine = engine
             self.setup_controls()

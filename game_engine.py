@@ -12,6 +12,7 @@ class GameState(Enum):
 
 class GameEngine:
     def __init__(self, gamestate_listener: Callable[[GameState], None]):
+        self.playing_state_listener = None
         self.player_sign = "X"  # TODO Player may choose to be Player2 instead later
         self.computer_player_sign = "O"
         self.listener = gamestate_listener
