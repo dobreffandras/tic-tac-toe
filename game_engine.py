@@ -1,7 +1,7 @@
 from enum import Enum
 from collections.abc import Callable
 from computer_player import ComputerPlayer
-from game_play_state import GamePlayState
+from game_play_state import GamePlayState, GameTurn
 
 
 class GameState(Enum):
@@ -16,7 +16,7 @@ class GameEngine:
         self.player_sign = None
         self.computer_player_sign = None
         self.listener = gamestate_listener
-        self.playing_state = GamePlayState()
+        self.playing_state = None
         self.gameover_state = None
         self.computer_player = ComputerPlayer()
 
@@ -26,14 +26,13 @@ class GameEngine:
     def start_playing(self, player_sign: str):
         self.player_sign = player_sign
         self.computer_player_sign = "O" if player_sign == "X" else "X"
+        self.playing_state = GamePlayState(GameTurn.PLAYER if player_sign == "X" else GameTurn.COMPUTER)
         self.listener(GameState.PLAYING)
 
-        if(self.computer_player_sign == "X"):
-            self.playing_state.change_turn(GamePlayState.GameTurn.COMPUTER) # TODO This has to be initial
-            self.playing_state_listener(self.playing_state)
+        if(self.playing_state.turn == GameTurn.COMPUTER):
             (c_r, c_c) = self.computer_player.next_move(self.playing_state.board)
             self.playing_state.add_sign_to((c_r, c_c), self.computer_player_sign)
-            self.playing_state.change_turn(GamePlayState.GameTurn.PLAYER)
+            self.playing_state.change_turn(GameTurn.PLAYER)
             self.playing_state_listener(self.playing_state)
 
     def player_chooses(self, r, c):
@@ -47,7 +46,7 @@ class GameEngine:
             self.playing_state_listener(self.playing_state)
 
         # Change active player to computer
-        self.playing_state.change_turn(GamePlayState.GameTurn.COMPUTER)
+        self.playing_state.change_turn(GameTurn.COMPUTER)
         self.playing_state_listener(self.playing_state)
 
         # Receive computers move and change active player to player
@@ -58,13 +57,13 @@ class GameEngine:
             self.listener(GameState.GAMEOVER)
             return
         else:
-            self.playing_state.change_turn(GamePlayState.GameTurn.PLAYER)
+            self.playing_state.change_turn(GameTurn.PLAYER)
             self.playing_state_listener(self.playing_state)
 
     def connect_playing_state_change_handler(self, playing_state_listener: Callable[[GamePlayState], None]):
         self.playing_state_listener = playing_state_listener
 
     def restart(self):
-        self.playing_state = GamePlayState() # TODO This has to be set only after navigation with a default initial player
+        self.playing_state = None
         self.gameover_state = None
         self.listener(GameState.START)

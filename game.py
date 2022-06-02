@@ -1,5 +1,5 @@
 from game_engine import GameEngine, GameState
-from game_play_state import GamePlayState
+from game_play_state import GamePlayState, GameTurn
 from tkinter import Tk, Frame, Label, Button, Radiobutton, PhotoImage, StringVar, NORMAL, DISABLED, CENTER
 import threading
 
@@ -40,7 +40,7 @@ class Game(Tk):
             self.layout_controls()
 
         def setup_controls(self):
-            self.images = { # TODO move to Game classvar
+            self.images = {  # TODO move to Game classvar
                 "CIRCLE": PhotoImage(file=r"images\circle.png", width=64, height=64),
                 "CROSS": PhotoImage(file=r"images\cross.png", width=64, height=64),
                 "EMPTY": PhotoImage(file=r"images\empty.png", width=64, height=64)
@@ -73,7 +73,7 @@ class Game(Tk):
 
         def playing_state_changed(self, state: GamePlayState):
             print("New State:", str(state))
-            is_player_on_turn = state.turn is GamePlayState.GameTurn.PLAYER
+            is_player_on_turn = state.turn is GameTurn.PLAYER
             on_player_turn = dict(text="It's your turn.", font=("Courier", "12", "bold"), bg="#0F0")
             on_computer_turn = dict(text="Opponent is on turn.", font=("Courier", "12", "bold"), bg="#FFA500")
             on_turn_config = on_player_turn if is_player_on_turn else on_computer_turn
@@ -87,7 +87,7 @@ class Game(Tk):
 
     class Start:
         def __init__(self, tk_root, engine: GameEngine):
-            self.player_sign_tkvar = StringVar(value = "X")
+            self.player_sign_tkvar = StringVar(value="X")
             self.frame = None
             self.welcome_label = None
             self.note_label = None
@@ -113,9 +113,9 @@ class Game(Tk):
         def layout_controls(self):
             self.frame.place(anchor=CENTER, relx=0.5, rely=0.5)
             self.welcome_label.pack()
-            self.sign_chooser_buttons[0].pack(pady=(5,0))
-            self.sign_chooser_buttons[1].pack(pady=(0,5))
-            self.note_label.pack(pady=(5,15))
+            self.sign_chooser_buttons[0].pack(pady=(5, 0))
+            self.sign_chooser_buttons[1].pack(pady=(0, 5))
+            self.note_label.pack(pady=(5, 15))
             self.game_start_button.pack()
 
     class GameOver:
@@ -144,7 +144,7 @@ class Game(Tk):
                 btn = Button(self.playfield,
                              image=self.images[btn_image],
                              state=DISABLED,
-                             command=self.none_command) # somehow tkinter button breaks without a command
+                             command=self.none_command)  # somehow tkinter button breaks without a command
                 self.playfield_buttons[(r, c)] = btn
             winner_sign = self.engine.gameover_state["winner"]
             game_over_text = f"Game over. {winner_sign} wins." if winner_sign else "Game over. It's a tie."

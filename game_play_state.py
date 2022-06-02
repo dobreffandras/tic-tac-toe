@@ -2,9 +2,14 @@ from enum import Enum
 import itertools
 
 
+class GameTurn(Enum):
+    PLAYER = "PLAYER"
+    COMPUTER = "COMPUTER"
+
+
 class GamePlayState:
-    def __init__(self):
-        self.turn: GamePlayState.GameTurn = GamePlayState.GameTurn.PLAYER
+    def __init__(self, game_turn: GameTurn):
+        self.turn: GameTurn = game_turn
         self.board: GamePlayState.GameBoard = GamePlayState.GameBoard()
 
     def __str__(self):
@@ -17,10 +22,6 @@ BOARD:
 
     def add_sign_to(self, coord: tuple[int, int], player_sign):
         self.board[coord] = player_sign
-
-    class GameTurn(Enum):
-        PLAYER = "PLAYER"
-        COMPUTER = "COMPUTER"
 
     class GameBoard:
         def __init__(self):
