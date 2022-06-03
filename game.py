@@ -40,7 +40,7 @@ class Game(Tk):
             self.layout_controls()
 
         def setup_controls(self):
-            self.images = {  # TODO move to Game classvar
+            self.images = {
                 "CIRCLE": PhotoImage(file=r"images\circle.png", width=64, height=64),
                 "CROSS": PhotoImage(file=r"images\cross.png", width=64, height=64),
                 "EMPTY": PhotoImage(file=r"images\empty.png", width=64, height=64)
