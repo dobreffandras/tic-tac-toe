@@ -45,16 +45,22 @@ class Game(Tk):
                 "CROSS": PhotoImage(file=r"images\cross.png", width=64, height=64),
                 "EMPTY": PhotoImage(file=r"images\empty.png", width=64, height=64)
             }
+            state = self.engine.playing_state
+            is_player_on_turn = state.turn is GameTurn.PLAYER
+            btn_state = NORMAL if is_player_on_turn else DISABLED
+
             self.playfield = Frame(self.tk_root)
             for r, c in self.indexes:
                 btn = Button(self.playfield,
                              image=self.images["EMPTY"],
+                             state=btn_state,
                              command=self.create_button_command(r, c))
                 self.playfield_buttons[(r, c)] = btn
-            self.on_turn_text_field = Label(self.tk_root,
-                                            text="It's your turn.",
-                                            font=("Courier", "12", "bold"),
-                                            bg="#0F0")
+
+            on_player_turn = dict(text="It's your turn.", font=("Courier", "12", "bold"), bg="#0F0") # TODO extract these
+            on_computer_turn = dict(text="Opponent is on turn.", font=("Courier", "12", "bold"), bg="#FFA500")
+            on_turn_config = on_player_turn if is_player_on_turn else on_computer_turn
+            self.on_turn_text_field = Label(self.tk_root, **on_turn_config)
 
         def create_button_command(self, r, c):
             def command():
@@ -74,7 +80,7 @@ class Game(Tk):
         def playing_state_changed(self, state: GamePlayState):
             print("New State:", str(state))
             is_player_on_turn = state.turn is GameTurn.PLAYER
-            on_player_turn = dict(text="It's your turn.", font=("Courier", "12", "bold"), bg="#0F0")
+            on_player_turn = dict(text="It's your turn.", font=("Courier", "12", "bold"), bg="#0F0")  # TODO extract these
             on_computer_turn = dict(text="Opponent is on turn.", font=("Courier", "12", "bold"), bg="#FFA500")
             on_turn_config = on_player_turn if is_player_on_turn else on_computer_turn
             self.on_turn_text_field.config(**on_turn_config)
@@ -108,7 +114,7 @@ class Game(Tk):
             self.note_label = Label(self.frame, text="Note: X is the first player", font=("Arial", "10", "italic"))
             self.game_start_button = Button(self.frame,
                                             text="Start Game",
-                                            command=lambda: self.engine.start_playing(self.player_sign_tkvar.get()))
+                                            command=threading.Thread(target=lambda :self.engine.start_playing(self.player_sign_tkvar.get())).start)
 
         def layout_controls(self):
             self.frame.place(anchor=CENTER, relx=0.5, rely=0.5)
