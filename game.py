@@ -117,7 +117,11 @@ class Game(Tk):
             self.note_label = Label(self.frame, text="Note: X is the first player", font=("Arial", "10", "italic"))
             self.game_start_button = Button(self.frame,
                                             text="Start Game",
-                                            command=threading.Thread(target=lambda :self.engine.start_playing(self.player_sign_tkvar.get())).start)
+                                            command=self.create_start_button_command())
+
+        def create_start_button_command(self):
+            thread = threading.Thread(target=lambda: self.engine.start_playing(self.player_sign_tkvar.get()))
+            return thread.start
 
         def layout_controls(self):
             self.frame.place(anchor=CENTER, relx=0.5, rely=0.5)
