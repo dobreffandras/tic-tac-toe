@@ -71,11 +71,12 @@ class Game(Tk):
             return lambda: t.start()
 
         def layout_controls(self):
-            self.playfield.pack(padx=20, pady=20)
-            self.on_turn_text_field.pack(ipadx=3, ipady=3)
             for key, btn in self.playfield_buttons.items():
                 r, c = key
                 btn.grid(row=r, column=c)
+
+            self.playfield.pack(padx=20, pady=20)
+            self.on_turn_text_field.pack(ipadx=3, ipady=3)
 
         def playing_state_changed(self, state: GamePlayState):
             print("New State:", str(state))
