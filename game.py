@@ -27,6 +27,12 @@ class Game(Tk):
         self.mainloop()
 
     class Playing:
+
+        turn_indicator_config = {
+            "player": dict(text="It's your turn.", font=("Courier", "12", "bold"), bg="#0F0"),
+            "computer": dict(text="Opponent is on turn.", font=("Courier", "12", "bold"), bg="#FFA500")
+        }
+
         def __init__(self, tk_root, engine: GameEngine):
             self.tk_root = tk_root
             self.engine = engine
@@ -57,9 +63,7 @@ class Game(Tk):
                              command=self.create_button_command(r, c))
                 self.playfield_buttons[(r, c)] = btn
 
-            on_player_turn = dict(text="It's your turn.", font=("Courier", "12", "bold"), bg="#0F0") # TODO extract these
-            on_computer_turn = dict(text="Opponent is on turn.", font=("Courier", "12", "bold"), bg="#FFA500")
-            on_turn_config = on_player_turn if is_player_on_turn else on_computer_turn
+            on_turn_config = self.turn_indicator_config["player" if is_player_on_turn else "computer"]
             self.on_turn_text_field = Label(self.tk_root, **on_turn_config)
 
         def create_button_command(self, r, c):
@@ -81,9 +85,7 @@ class Game(Tk):
         def playing_state_changed(self, state: GamePlayState):
             print("New State:", str(state))
             is_player_on_turn = state.turn is GameTurn.PLAYER
-            on_player_turn = dict(text="It's your turn.", font=("Courier", "12", "bold"), bg="#0F0")  # TODO extract these
-            on_computer_turn = dict(text="Opponent is on turn.", font=("Courier", "12", "bold"), bg="#FFA500")
-            on_turn_config = on_player_turn if is_player_on_turn else on_computer_turn
+            on_turn_config = self.turn_indicator_config["player" if is_player_on_turn else "computer"]
             self.on_turn_text_field.config(**on_turn_config)
             for key, btn in self.playfield_buttons.items():
                 item = state.board[key]
