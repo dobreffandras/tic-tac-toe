@@ -5,9 +5,9 @@ import threading
 
 
 class Game(Tk):
-    def __init__(self):
+    def __init__(self, computer_strategy_file_path: str):
         super().__init__()
-        self.game_engine = GameEngine(self.gamestate_change_handler)
+        self.game_engine = GameEngine(self.gamestate_change_handler, computer_strategy_file_path)
         self.title("Tic tac toe")
         self.geometry("250x320")
 

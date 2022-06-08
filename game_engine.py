@@ -11,14 +11,14 @@ class GameState(Enum):
 
 
 class GameEngine:
-    def __init__(self, gamestate_listener: Callable[[GameState], None]):
+    def __init__(self, gamestate_listener: Callable[[GameState], None], computer_strategy_file_path: str):
         self.playing_state_listener = None
         self.player_sign = None
         self.computer_player_sign = None
         self.listener = gamestate_listener
         self.playing_state = None
         self.gameover_state = None
-        self.computer_player = ComputerPlayer()
+        self.computer_player = ComputerPlayer(computer_strategy_file_path)
 
     def launch(self):
         self.listener(GameState.START)

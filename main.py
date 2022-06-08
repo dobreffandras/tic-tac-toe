@@ -1,3 +1,3 @@
 from game import Game
 
-Game().launch()
+Game("computer.strategy").launch()
