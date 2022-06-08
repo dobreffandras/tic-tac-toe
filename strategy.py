@@ -1,5 +1,5 @@
 import abc
-from collections import deque
+from collections import deque, Counter
 from typing import Optional
 from pathlib import Path
 
@@ -78,21 +78,26 @@ class ComputerStrategyBuilder:
         nodes_to_calculate : deque[StrategyNode] = deque([strategy_graph["-"*9]])
         while len(nodes_to_calculate):
             node = nodes_to_calculate.popleft()
+            if(node.strategy is not None): # the node has strategy already
+                continue
             key = node.key
             children = strategy_graph[key].children
             children_strategies = [strategy_graph[c].strategy for c in children]
-            if winner_sign := self.gameover_state(key):
-                strategy_graph[key].strategy = [winner_sign]
-            elif all(children_strategies):
+            game_over = self.gameover_state(key)
+            if game_over[0]:
+                strategy_graph[key].strategy = game_over[1]
+            elif all([x is not None for x in children_strategies]):
                 strategy = self.calculate_strategy_from_children(children_strategies)
                 strategy_graph[key].strategy = strategy
             else:
                 for c in children:
-                    nodes_to_calculate.appendleft(strategy_graph[c]) # calculating children of the current node must be done first
-                nodes_to_calculate.append(node) # Need to recalculate current node later
+                    if c not in nodes_to_calculate:
+                        nodes_to_calculate.appendleft(strategy_graph[c]) # calculating children of the current node must be done first
+                if node not in nodes_to_calculate:
+                    nodes_to_calculate.append(node) # Need to recalculate current node later
         return strategy_graph
 
-    def calculate_strategy_from_children(self, children_strategies):
+    def calculate_strategy_from_children(self, children_strategies : list[Optional[list[str]]]):
         x_win_strategy = any(["X" in s for s in children_strategies])
         o_win_strategy = any(["O" in s for s in children_strategies])
         strategy = []
@@ -102,8 +107,39 @@ class ComputerStrategyBuilder:
             strategy.append("O")
         return strategy
 
-    def gameover_state(self, board: str) -> str:
-        return board.count("-") == 0 and "X" # All full boards are winning states for X for now
+    def gameover_state(self, board: str) -> (bool, Optional[str]):
+        def board_is_full():
+            return board.count("-") == 0
 
+        def has_sign_on_indexes(sign: str, i0: int, i1: int, i2 :int):
+            return board[i0] == sign \
+                and board[i1] == sign \
+                    and board[i2] == sign
+
+        def does_win(sign: str) -> str:
+            def signs_in_a_row():
+                return has_sign_on_indexes(sign, 0, 1, 2) \
+                       or has_sign_on_indexes(sign, 3, 4, 5) \
+                       or has_sign_on_indexes(sign, 6, 7, 8)
+
+            def signs_in_a_column():
+                return has_sign_on_indexes(sign, 0, 3, 6) \
+                       or has_sign_on_indexes(sign, 1, 4, 7) \
+                       or has_sign_on_indexes(sign, 2, 5, 8)
+
+            def signs_in_a_diagonal():
+                return has_sign_on_indexes(sign, 0, 4, 8) \
+                       or has_sign_on_indexes(sign, 2, 4, 6)
+
+            wins = signs_in_a_row() or signs_in_a_column() or signs_in_a_diagonal()
+            return sign if wins else None
+
+        if does_win("X"):
+            return (True, ["X"])
+        if does_win("O"):
+            return (True, ["O"])
+        if board_is_full():
+            return (True, [])
+        return (False, None)
 
 ComputerStrategyBuilder("local.strategy").build() # Just for testing purposes
