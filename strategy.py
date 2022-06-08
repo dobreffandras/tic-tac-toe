@@ -21,6 +21,7 @@ class BasicStrategyBuilder:
     def build(self) -> Strategy:
         return BasicStrategy()
 
+
 class ComputerStrategy(Strategy):
     def __init__(self):
         self.data = []
@@ -29,7 +30,15 @@ class ComputerStrategy(Strategy):
         return (0,0) # TODO write logic for stepping
 
 
+class StrategyNode:
+    def __init__(self, key: str, children: list[str]):
+        self.key: str = key
+        self.children: list[str] = children
+        self.strategy: Optional[list[str]] = None
+
+
 class ComputerStrategyBuilder:
+
     def __init__(self, computer_strategy_file_path: str):
         self.file = Path(computer_strategy_file_path)
 
@@ -48,10 +57,10 @@ class ComputerStrategyBuilder:
         computed_state_graph = self.compute_states_with_children(states_to_evaluate)
         computed_strategy_graph = self.compute_strategy_with_children(computed_state_graph)
         strat = ComputerStrategy()
-        strat.data = {k[0]:f"(s={k[1].strategy} c={k[1].children}" for k in computed_strategy_graph.items()}
+        strat.data = {k[0]:f"(s={k[1].strategy} c={k[1].children}" for k in computed_strategy_graph.items()} # TODO set in ctor
         return strat
 
-    def compute_states_with_children(self, states_to_evaluate):
+    def compute_states_with_children(self, states_to_evaluate) -> list[StrategyNode]:
         computed_states = []
         while len(states_to_evaluate):
             state = states_to_evaluate.pop()
@@ -64,17 +73,11 @@ class ComputerStrategyBuilder:
                     states_to_evaluate.append(s)
                     children.append(s)
 
-            computed_states.append({"key": ''.join(state), "children": [''.join(c) for c in children]})
+            computed_states.append(StrategyNode(''.join(state), [''.join(c) for c in children]))
         return computed_states
 
-    def compute_strategy_with_children(self, computed_state_graph):
-        class StrategyNode: # TODO namedtuple
-            def __init__(self, key:str, children: list[str]):
-                self.key : str = key
-                self.children: list[str] = children
-                self.strategy : Optional[list[str]] = None
-
-        strategy_graph : dict[str, StrategyNode]= {g["key"]:StrategyNode(g["key"], g["children"]) for g in computed_state_graph}
+    def compute_strategy_with_children(self, computed_state_graph: list[StrategyNode]):
+        strategy_graph : dict[str, StrategyNode]= {g.key:g for g in computed_state_graph}
         nodes_to_calculate : deque[StrategyNode] = deque([strategy_graph["-"*9]])
         while len(nodes_to_calculate):
             node = nodes_to_calculate.popleft()
