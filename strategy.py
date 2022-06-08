@@ -1,6 +1,7 @@
 import abc
 from collections import deque
-from typing import Optional, NamedTuple
+from enum import Enum
+from typing import NamedTuple
 from pathlib import Path
 
 from game_play_state import GamePlayState
@@ -30,17 +31,25 @@ class ComputerStrategy(Strategy):
         return (0,0) # TODO write logic for stepping
 
 
+class Winner(Enum):
+    UNKNOWN = "UNKNOWN"
+    X = "X"
+    O = "O"
+    BOTH = "BOTH"
+
+
 class StrategyNode:
     def __init__(self, key: str, children: list[str]):
         self.key: str = key
         self.children: list[str] = children
-        self.strategy: Optional[list[str]] = None
+        self.strategy: Winner = Winner.UNKNOWN
 
 
 class ComputerStrategyBuilder:
+
     class GameOverState(NamedTuple):
         is_gameover: bool
-        winner: Optional[list[str]]
+        winner: Winner
 
     def __init__(self, computer_strategy_file_path: str):
         self.file = Path(computer_strategy_file_path)
@@ -84,7 +93,7 @@ class ComputerStrategyBuilder:
         nodes_to_calculate : deque[StrategyNode] = deque([strategy_graph["-"*9]])
         while len(nodes_to_calculate):
             node = nodes_to_calculate.popleft()
-            if(node.strategy is not None): # the node has strategy already
+            if(node.strategy is not Winner.UNKNOWN): # the node has strategy already
                 continue
             key = node.key
             children = strategy_graph[key].children
@@ -92,7 +101,7 @@ class ComputerStrategyBuilder:
             game_over = self.gameover_state(key)
             if game_over.is_gameover:
                 strategy_graph[key].strategy = game_over.winner
-            elif all([x is not None for x in children_strategies]):
+            elif all([x is not Winner.UNKNOWN for x in children_strategies]):
                 strategy = self.calculate_strategy_from_children(children_strategies)
                 strategy_graph[key].strategy = strategy
             else:
@@ -103,15 +112,20 @@ class ComputerStrategyBuilder:
                     nodes_to_calculate.append(node) # Need to recalculate current node later
         return strategy_graph
 
-    def calculate_strategy_from_children(self, children_strategies : list[Optional[list[str]]]):
-        x_win_strategy = any(["X" in s for s in children_strategies])
-        o_win_strategy = any(["O" in s for s in children_strategies])
-        strategy = []
+    def calculate_strategy_from_children(self, children_strategies : list[Winner]):
+        x_win_strategy = any([s is Winner.X for s in children_strategies])
+        o_win_strategy = any([s is Winner.O for s in children_strategies])
+        both_win_strategy = any([s is Winner.BOTH for s in children_strategies])
+
+        if both_win_strategy:
+            return Winner.BOTH
+        if x_win_strategy and o_win_strategy:
+            return Winner.BOTH
         if x_win_strategy:
-            strategy.append("X")
+            return Winner.X
         if o_win_strategy:
-            strategy.append("O")
-        return strategy
+            return Winner.O
+        return Winner.UNKNOWN
 
     def gameover_state(self, board: str) -> GameOverState:
         def board_is_full():
@@ -141,11 +155,11 @@ class ComputerStrategyBuilder:
             return sign if wins else None
 
         if does_win("X"):
-            return ComputerStrategyBuilder.GameOverState(True, ["X"])
+            return ComputerStrategyBuilder.GameOverState(True, Winner.X)
         if does_win("O"):
-            return ComputerStrategyBuilder.GameOverState(True, ["O"])
+            return ComputerStrategyBuilder.GameOverState(True, Winner.O)
         if board_is_full():
-            return ComputerStrategyBuilder.GameOverState(True, [])
-        return ComputerStrategyBuilder.GameOverState(False, None)
+            return ComputerStrategyBuilder.GameOverState(True, Winner.BOTH)
+        return ComputerStrategyBuilder.GameOverState(False, Winner.UNKNOWN)
 
 ComputerStrategyBuilder("local.strategy").build() # Just for testing purposes
