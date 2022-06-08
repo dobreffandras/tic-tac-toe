@@ -1,6 +1,6 @@
 import abc
-from collections import deque, Counter
-from typing import Optional
+from collections import deque
+from typing import Optional, NamedTuple
 from pathlib import Path
 
 from game_play_state import GamePlayState
@@ -38,6 +38,9 @@ class StrategyNode:
 
 
 class ComputerStrategyBuilder:
+    class GameOverState(NamedTuple):
+        is_gameover: bool
+        winner: Optional[list[str]]
 
     def __init__(self, computer_strategy_file_path: str):
         self.file = Path(computer_strategy_file_path)
@@ -87,8 +90,8 @@ class ComputerStrategyBuilder:
             children = strategy_graph[key].children
             children_strategies = [strategy_graph[c].strategy for c in children]
             game_over = self.gameover_state(key)
-            if game_over[0]:
-                strategy_graph[key].strategy = game_over[1]
+            if game_over.is_gameover:
+                strategy_graph[key].strategy = game_over.winner
             elif all([x is not None for x in children_strategies]):
                 strategy = self.calculate_strategy_from_children(children_strategies)
                 strategy_graph[key].strategy = strategy
@@ -110,7 +113,7 @@ class ComputerStrategyBuilder:
             strategy.append("O")
         return strategy
 
-    def gameover_state(self, board: str) -> (bool, Optional[str]):
+    def gameover_state(self, board: str) -> GameOverState:
         def board_is_full():
             return board.count("-") == 0
 
@@ -138,11 +141,11 @@ class ComputerStrategyBuilder:
             return sign if wins else None
 
         if does_win("X"):
-            return (True, ["X"])
+            return ComputerStrategyBuilder.GameOverState(True, ["X"])
         if does_win("O"):
-            return (True, ["O"])
+            return ComputerStrategyBuilder.GameOverState(True, ["O"])
         if board_is_full():
-            return (True, [])
-        return (False, None)
+            return ComputerStrategyBuilder.GameOverState(True, [])
+        return ComputerStrategyBuilder.GameOverState(False, None)
 
 ComputerStrategyBuilder("local.strategy").build() # Just for testing purposes
