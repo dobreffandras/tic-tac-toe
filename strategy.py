@@ -20,6 +20,9 @@ class BasicStrategyBuilder:
         return BasicStrategy()
 
 class ComputerStrategy(Strategy):
+    def __init__(self):
+        self.data = []
+
     def step(self, board: GamePlayState.GameBoard) -> tuple[int,int]:
         return (0,0) # TODO write logic for stepping
 
@@ -33,8 +36,33 @@ class ComputerStrategyBuilder:
             ...
         else:
             strategy = self.build_strategy()
-            # TODO save strategy to file
+            with open(self.file, "w+") as f:
+                f.write(repr(strategy.data[0:500]))
             return strategy
 
-    def build_strategy(self) -> Strategy:
-        pass
+    def build_strategy(self) -> ComputerStrategy:
+        states_to_evaluate = [["-"]*9]
+        computed_state_graph = self.compute_states_with_children(states_to_evaluate)
+
+        strat = ComputerStrategy()
+        strat.data = computed_state_graph
+        return strat
+
+    def compute_states_with_children(self, states_to_evaluate):
+        computed_states = []
+        while len(states_to_evaluate):
+            state = states_to_evaluate.pop()
+            children = []
+            sign = "X" if state.count("X") == state.count("O") else "O"
+            for i in range(0, 9):
+                s = state.copy()  # for not overwriting the state
+                if (s[i] == "-"):
+                    s[i] = sign
+                    states_to_evaluate.append(s)
+                    children.append(s)
+
+            computed_states.append({"key": ''.join(state), "children": [''.join(c) for c in children]})
+        return computed_states
+
+
+ComputerStrategyBuilder("local.strategy").build() # Just for testing purposes
