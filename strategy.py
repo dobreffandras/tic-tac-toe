@@ -2,7 +2,7 @@ import abc
 import pickle
 from collections import deque
 from enum import Enum
-from typing import NamedTuple
+from typing import NamedTuple, Optional
 from pathlib import Path
 from game_play_state import GamePlayState
 
@@ -19,11 +19,6 @@ class Strategy(abc.ABC):
 class BasicStrategy(Strategy):
     def step(self, board: GamePlayState.GameBoard) -> tuple[int,int]:
         return next((move for (move, val) in board.items() if val is None))
-
-
-class BasicStrategyBuilder:
-    def build(self) -> Strategy:
-        return BasicStrategy()
 
 
 class Winner(Enum):
@@ -57,15 +52,20 @@ class ComputerStrategyBuilder:
         self.file = Path(computer_strategy_file_path)
 
     def build(self) -> Strategy:
+        strategy = self.build_strategy()
+        with open(self.file, "wb+") as f:
+            pickle.dump(strategy, f)
+        return strategy
+
+    def load(self) -> Optional[ComputerStrategy]:
         if self.file.exists():
             with open(self.file, "rb+") as f:
-                strategy = pickle.load(f)
-            return strategy
+                try:
+                    return pickle.load(f)
+                except:
+                    return None
         else:
-            strategy = self.build_strategy()
-            with open(self.file, "wb+") as f:
-                pickle.dump(strategy, f)
-            return strategy
+            return None
 
     def build_strategy(self) -> ComputerStrategy:
         states_to_evaluate = [[EMPTY_SIGN] * 9]
