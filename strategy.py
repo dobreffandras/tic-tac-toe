@@ -49,13 +49,13 @@ class ComputerStrategy(Strategy):
         self.data : dict[str, StrategyNode] = data
 
     def step(self, board: GamePlayState.GameBoard, sign: str, difficulty: Difficulty) -> tuple[int,int]:
-        def choose_from_possibilities(*, winning, not_loosing, loosing):
-            if len(winning):
-                return choice(winning)
-            elif len(not_loosing):
-                return choice(not_loosing)
+        def choose_from_possibilities(*, best, natural, worst):
+            if len(best):
+                return choice(best)
+            elif len(natural):
+                return choice(natural)
             else:
-                return choice(loosing)
+                return choice(worst)
 
         state = self.create_state_from_board(board)
         next_states = self.compute_next_states(state, sign)
@@ -65,21 +65,21 @@ class ComputerStrategy(Strategy):
 
         if sign == X_SIGN:
             if difficulty == Difficulty.HARD:
-                return choose_from_possibilities(winning=x_winners, not_loosing=both_winners, loosing=o_winners)
+                return choose_from_possibilities(best=x_winners, natural=both_winners, worst=o_winners)
             elif difficulty == Difficulty.MEDIUM:
                 not_loosing = [*x_winners, *both_winners, *o_winners]
-                return  choose_from_possibilities(winning=[], not_loosing=not_loosing, loosing=[])
+                return  choose_from_possibilities(best=[], natural=not_loosing, worst=[])
             else:
-                return choose_from_possibilities(winning=o_winners, not_loosing=both_winners, loosing=x_winners)
+                return choose_from_possibilities(best=o_winners, natural=both_winners, worst=x_winners)
 
         if sign == O_SIGN:
             if difficulty == Difficulty.HARD:
-                return choose_from_possibilities(winning=o_winners, not_loosing=both_winners, loosing=x_winners)
+                return choose_from_possibilities(best=o_winners, natural=both_winners, worst=x_winners)
             elif difficulty == Difficulty.MEDIUM:
                 not_loosing = [*x_winners, *both_winners, *o_winners]
-                return  choose_from_possibilities(winning=[], not_loosing=not_loosing, loosing=[])
+                return  choose_from_possibilities(best=[], natural=not_loosing, worst=[])
             else:
-                return choose_from_possibilities(winning=x_winners, not_loosing=both_winners, loosing=o_winners)
+                return choose_from_possibilities(best=x_winners, natural=both_winners, worst=o_winners)
 
     def create_state_from_board(self, board : GamePlayState.GameBoard):
         signs = [board[(r,c)] for r in range(3) for c in range(3)]
