@@ -6,6 +6,9 @@ from pathlib import Path
 
 from game_play_state import GamePlayState
 
+EMPTY_SIGN = "-"
+X_SIGN = "X"
+O_SIGN = "O"
 
 class Strategy(abc.ABC):
     @abc.abstractmethod
@@ -65,7 +68,7 @@ class ComputerStrategyBuilder:
             return strategy
 
     def build_strategy(self) -> ComputerStrategy:
-        states_to_evaluate = [["-"]*9]
+        states_to_evaluate = [[EMPTY_SIGN] * 9]
         computed_state_graph = self.compute_states_with_children(states_to_evaluate)
         computed_strategy_graph = self.compute_strategy_with_children(computed_state_graph)
         strat = ComputerStrategy()
@@ -77,13 +80,13 @@ class ComputerStrategyBuilder:
         while len(states_to_evaluate):
             state = states_to_evaluate.pop()
             children = []
-            sign = "X" if state.count("X") == state.count("O") else "O"
+            sign = X_SIGN if state.count(X_SIGN) == state.count(O_SIGN) else O_SIGN
             state_key = ''.join(state)
             gameover_state = self.gameover_state(state_key)
             if not gameover_state.is_gameover:
                 for i in range(0, 9):
                     s = state.copy()  # for not overwriting the state
-                    if (s[i] == "-"):
+                    if (s[i] == EMPTY_SIGN):
                         s[i] = sign
                         states_to_evaluate.append(s)
                         children.append(s)
@@ -94,7 +97,7 @@ class ComputerStrategyBuilder:
 
     def compute_strategy_with_children(self, computed_state_graph: list[StrategyNode]):
         strategy_graph : dict[str, StrategyNode]= {g.key:g for g in computed_state_graph}
-        nodes_to_calculate : deque[StrategyNode] = deque([strategy_graph["-"*9]])
+        nodes_to_calculate : deque[StrategyNode] = deque([strategy_graph[EMPTY_SIGN*9]])
         while len(nodes_to_calculate):
             node = nodes_to_calculate.popleft()
             if(node.strategy is not Winner.UNKNOWN): # the node has strategy already
@@ -131,7 +134,7 @@ class ComputerStrategyBuilder:
 
     def gameover_state(self, board: str) -> GameOverState:
         def board_is_full():
-            return board.count("-") == 0
+            return board.count(EMPTY_SIGN) == 0
 
         def has_sign_on_indexes(sign: str, i0: int, i1: int, i2 :int):
             return board[i0] == sign \
@@ -156,9 +159,9 @@ class ComputerStrategyBuilder:
             wins = signs_in_a_row() or signs_in_a_column() or signs_in_a_diagonal()
             return sign if wins else None
 
-        if does_win("X"):
+        if does_win(X_SIGN):
             return ComputerStrategyBuilder.GameOverState(True, Winner.X)
-        if does_win("O"):
+        if does_win(O_SIGN):
             return ComputerStrategyBuilder.GameOverState(True, Winner.O)
         if board_is_full():
             return ComputerStrategyBuilder.GameOverState(True, Winner.BOTH)
