@@ -2,8 +2,8 @@ import abc
 import pickle
 from collections import deque
 from enum import Enum
-from itertools import groupby
-from typing import NamedTuple, Optional, Generator
+from random import choice
+from typing import NamedTuple, Optional
 from pathlib import Path
 from game_play_state import GamePlayState
 
@@ -52,19 +52,19 @@ class ComputerStrategy(Strategy):
 
         if sign == X_SIGN:
             if len(x_winners):
-                return x_winners[0]
+                return choice(x_winners)
             elif len(both_winners):
-                return both_winners[0]
+                return choice(both_winners)
             else:
-                return o_winners[0]
+                return choice(o_winners)
 
         if sign == O_SIGN:
             if len(o_winners):
-                return o_winners[0]
+                return choice(o_winners)
             elif len(both_winners):
-                return both_winners[0]
+                return choice(both_winners)
             else:
-                return x_winners[0]
+                return choice(x_winners)
 
         return (0,0) # TODO write logic for stepping
 
