@@ -2,7 +2,8 @@ import abc
 import pickle
 from collections import deque
 from enum import Enum
-from typing import NamedTuple, Optional
+from itertools import groupby
+from typing import NamedTuple, Optional, Generator
 from pathlib import Path
 from game_play_state import GamePlayState
 
@@ -12,12 +13,12 @@ O_SIGN = "O"
 
 class Strategy(abc.ABC):
     @abc.abstractmethod
-    def step(self, board: GamePlayState.GameBoard) -> tuple[int,int]:
+    def step(self, board: GamePlayState.GameBoard, sign: str) -> tuple[int,int]:
         pass
 
 
 class BasicStrategy(Strategy):
-    def step(self, board: GamePlayState.GameBoard) -> tuple[int,int]:
+    def step(self, board: GamePlayState.GameBoard, sign: str) -> tuple[int,int]:
         return next((move for (move, val) in board.items() if val is None))
 
 
@@ -36,11 +37,30 @@ class StrategyNode:
 
 
 class ComputerStrategy(Strategy):
-    def __init__(self, data: dict[str, StrategyNode]):
-        self.data = data
+    def __init__(self, data: dict[str, StrategyNode]): # TODO inject difficulty
+        self.data : dict[str, StrategyNode] = data
 
-    def step(self, board: GamePlayState.GameBoard) -> tuple[int,int]:
+    def step(self, board: GamePlayState.GameBoard, sign: str) -> tuple[int,int]:
+        state = self.create_state_from_board(board)
+        next_states = self.compute_next_states(state, sign)
+        grouped = groupby([self.data[n] for n in next_states], lambda k: k.strategy)
+        print(grouped)
         return (0,0) # TODO write logic for stepping
+
+    def create_state_from_board(self, board : GamePlayState.GameBoard):
+        signs = [board[(r,c)] for r in range(3) for c in range(3)]
+        converted_signs = [x if x == X_SIGN or x == O_SIGN else EMPTY_SIGN for x in signs]
+        return ''.join(converted_signs)
+
+    def compute_next_states(self, state: str, sign: str) -> list[str]:
+        next_states = []
+        for i in range(9):
+            if state[i] is EMPTY_SIGN:
+                s = [*state]
+                s[i] = sign
+                next_states.append(''.join(s))
+        return next_states
+
 
 
 class ComputerStrategyBuilder:
@@ -62,7 +82,7 @@ class ComputerStrategyBuilder:
             with open(self.file, "rb+") as f:
                 try:
                     return pickle.load(f)
-                except:
+                except Exception as e:
                     return None
         else:
             return None
