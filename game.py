@@ -134,6 +134,7 @@ class Game(Tk):
                 player_sign = self.player_sign_tkvar.get()
                 difficulty = Difficulty(self.difficulty_tkvar.get())
                 self.engine.start_playing(player_sign, difficulty)
+
             thread = threading.Thread(target=start)
             return thread.start
 
@@ -182,7 +183,8 @@ class Game(Tk):
             self.game_over_label = Label(self.tk_root, font=("Courier", "12", "bold"), text=game_over_text)
             self.restart_button = Button(self.tk_root, text="Restart", command=self.engine.restart)
 
-        def none_command(self): ...
+        def none_command(self):
+            ...
 
         def layout_controls(self):
             self.playfield.pack(padx=20, pady=20)

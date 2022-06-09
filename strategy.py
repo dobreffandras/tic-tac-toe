@@ -13,19 +13,21 @@ EMPTY_SIGN = "-"
 X_SIGN = "X"
 O_SIGN = "O"
 
+
 class Difficulty(Enum):
     EASY = 1
     MEDIUM = 2
     HARD = 3
 
+
 class Strategy(abc.ABC):
     @abc.abstractmethod
-    def step(self, board: GamePlayState.GameBoard, sign: str, difficulty: Difficulty) -> tuple[int,int]:
+    def step(self, board: GamePlayState.GameBoard, sign: str, difficulty: Difficulty) -> tuple[int, int]:
         pass
 
 
 class BasicStrategy(Strategy):
-    def step(self, board: GamePlayState.GameBoard, sign: str, difficulty: Difficulty) -> tuple[int,int]:
+    def step(self, board: GamePlayState.GameBoard, sign: str, difficulty: Difficulty) -> tuple[int, int]:
         return next((move for (move, val) in board.items() if val is None))
 
 
@@ -46,9 +48,9 @@ class StrategyNode:
 
 class ComputerStrategy(Strategy):
     def __init__(self, data: dict[str, StrategyNode]):
-        self.data : dict[str, StrategyNode] = data
+        self.data: dict[str, StrategyNode] = data
 
-    def step(self, board: GamePlayState.GameBoard, sign: str, difficulty: Difficulty) -> tuple[int,int]:
+    def step(self, board: GamePlayState.GameBoard, sign: str, difficulty: Difficulty) -> tuple[int, int]:
         def choose_from_possibilities(*, best, natural, worst):
             if len(best):
                 return choice(best)
@@ -68,7 +70,7 @@ class ComputerStrategy(Strategy):
                 return choose_from_possibilities(best=x_winners, natural=both_winners, worst=o_winners)
             elif difficulty == Difficulty.MEDIUM:
                 not_loosing = [*x_winners, *both_winners, *o_winners]
-                return  choose_from_possibilities(best=[], natural=not_loosing, worst=[])
+                return choose_from_possibilities(best=[], natural=not_loosing, worst=[])
             else:
                 return choose_from_possibilities(best=o_winners, natural=both_winners, worst=x_winners)
 
@@ -77,12 +79,12 @@ class ComputerStrategy(Strategy):
                 return choose_from_possibilities(best=o_winners, natural=both_winners, worst=x_winners)
             elif difficulty == Difficulty.MEDIUM:
                 not_loosing = [*x_winners, *both_winners, *o_winners]
-                return  choose_from_possibilities(best=[], natural=not_loosing, worst=[])
+                return choose_from_possibilities(best=[], natural=not_loosing, worst=[])
             else:
                 return choose_from_possibilities(best=x_winners, natural=both_winners, worst=o_winners)
 
-    def create_state_from_board(self, board : GamePlayState.GameBoard):
-        signs = [board[(r,c)] for r in range(3) for c in range(3)]
+    def create_state_from_board(self, board: GamePlayState.GameBoard):
+        signs = [board[(r, c)] for r in range(3) for c in range(3)]
         converted_signs = [x if x == X_SIGN or x == O_SIGN else EMPTY_SIGN for x in signs]
         return ''.join(converted_signs)
 
@@ -93,9 +95,8 @@ class ComputerStrategy(Strategy):
                 s = [*state]
                 s[i] = sign
                 index = divmod(i, 3)
-                next_states[''.join(s)]= index
+                next_states[''.join(s)] = index
         return next_states
-
 
 
 class ComputerStrategyBuilder:
@@ -149,11 +150,11 @@ class ComputerStrategyBuilder:
         return computed_states
 
     def compute_strategy_with_children(self, computed_state_graph: list[StrategyNode]):
-        strategy_graph : dict[str, StrategyNode]= {g.key:g for g in computed_state_graph}
-        nodes_to_calculate : deque[StrategyNode] = deque([strategy_graph[EMPTY_SIGN*9]])
+        strategy_graph: dict[str, StrategyNode] = {g.key: g for g in computed_state_graph}
+        nodes_to_calculate: deque[StrategyNode] = deque([strategy_graph[EMPTY_SIGN * 9]])
         while len(nodes_to_calculate):
             node = nodes_to_calculate.popleft()
-            if(node.strategy is not Winner.UNKNOWN): # the node has strategy already
+            if (node.strategy is not Winner.UNKNOWN):  # the node has strategy already
                 continue
             key = node.key
             children = strategy_graph[key].children
@@ -165,12 +166,13 @@ class ComputerStrategyBuilder:
             else:
                 for c in children:
                     if c not in nodes_to_calculate:
-                        nodes_to_calculate.appendleft(strategy_graph[c]) # calculating children of the current node must be done first
+                        nodes_to_calculate.appendleft(
+                            strategy_graph[c])  # calculating children of the current node must be done first
                 if node not in nodes_to_calculate:
-                    nodes_to_calculate.append(node) # Need to recalculate current node later
+                    nodes_to_calculate.append(node)  # Need to recalculate current node later
         return strategy_graph
 
-    def calculate_strategy_from_children(self, children_strategies : list[Winner], on_turn: str):
+    def calculate_strategy_from_children(self, children_strategies: list[Winner], on_turn: str):
         x_win_strategy = any([s is Winner.X for s in children_strategies])
         o_win_strategy = any([s is Winner.O for s in children_strategies])
         both_win_strategy = any([s is Winner.BOTH for s in children_strategies])
@@ -197,10 +199,10 @@ class ComputerStrategyBuilder:
         def board_is_full():
             return board.count(EMPTY_SIGN) == 0
 
-        def has_sign_on_indexes(sign: str, i0: int, i1: int, i2 :int):
+        def has_sign_on_indexes(sign: str, i0: int, i1: int, i2: int):
             return board[i0] == sign \
-                and board[i1] == sign \
-                    and board[i2] == sign
+                   and board[i1] == sign \
+                   and board[i2] == sign
 
         def does_win(sign: str) -> str:
             def signs_in_a_row():
@@ -227,6 +229,7 @@ class ComputerStrategyBuilder:
         if board_is_full():
             return ComputerStrategyBuilder.GameOverState(True, Winner.BOTH)
         return ComputerStrategyBuilder.GameOverState(False, Winner.UNKNOWN)
+
 
 if (__name__ == '__main__'):
     ComputerStrategyBuilder(FILENAME).build()

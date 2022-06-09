@@ -9,11 +9,9 @@ module_dict["StrategyNode"] = strategy.StrategyNode
 module_dict["Winner"] = strategy.Winner
 
 loaded_strategy = ComputerStrategyBuilder(strategy.FILENAME).load()
-if(loaded_strategy) :
+if (loaded_strategy):
     print("Computer is playing with winning strategy.")
     Game(loaded_strategy).launch()
 else:
     print("Computer is playing with basic strategy.")
     Game(BasicStrategy()).launch()
-
-

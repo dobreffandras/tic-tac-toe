@@ -9,7 +9,6 @@ class ComputerPlayer:
         self.strategy = strategy
         self.difficulty = difficulty
 
-
     def next_move(self, board: GamePlayState.GameBoard) -> tuple[int, int]:
         sleep(1 / 3)
         return self.strategy.step(board, self.sign, self.difficulty)

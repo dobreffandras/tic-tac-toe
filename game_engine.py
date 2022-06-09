@@ -19,7 +19,7 @@ class GameEngine:
         self.playing_state_listener = None
         self.player_sign = None
         self.listener = gamestate_listener
-        self.playing_state : Optional[GamePlayState] = None
+        self.playing_state: Optional[GamePlayState] = None
         self.gameover_state = None
         self.computer_player = None
 
@@ -33,7 +33,7 @@ class GameEngine:
         self.playing_state = GamePlayState(GameTurn.PLAYER if player_sign == "X" else GameTurn.COMPUTER)
         self.listener(GameState.PLAYING)
 
-        if(self.playing_state.turn == GameTurn.COMPUTER):
+        if (self.playing_state.turn == GameTurn.COMPUTER):
             (c_r, c_c) = self.computer_player.next_move(self.playing_state.board)
             self.playing_state.add_sign_to((c_r, c_c), self.computer_player.sign)
             self.playing_state.change_turn(GameTurn.PLAYER)
