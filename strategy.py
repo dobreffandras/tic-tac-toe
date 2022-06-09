@@ -118,7 +118,7 @@ class ComputerStrategyBuilder:
             with open(self.file, "rb+") as f:
                 try:
                     return pickle.load(f)
-                except Exception as e:
+                except:
                     return None
         else:
             return None
@@ -140,7 +140,7 @@ class ComputerStrategyBuilder:
             if not gameover_state.is_gameover:
                 for i in range(0, 9):
                     s = state.copy()  # for not overwriting the state
-                    if (s[i] == EMPTY_SIGN):
+                    if s[i] == EMPTY_SIGN:
                         s[i] = sign
                         states_to_evaluate.append(s)
                         children.append(s)
@@ -154,7 +154,7 @@ class ComputerStrategyBuilder:
         nodes_to_calculate: deque[StrategyNode] = deque([strategy_graph[EMPTY_SIGN * 9]])
         while len(nodes_to_calculate):
             node = nodes_to_calculate.popleft()
-            if (node.strategy is not Winner.UNKNOWN):  # the node has strategy already
+            if node.strategy is not Winner.UNKNOWN:  # the node has strategy already
                 continue
             key = node.key
             children = strategy_graph[key].children
@@ -231,5 +231,5 @@ class ComputerStrategyBuilder:
         return ComputerStrategyBuilder.GameOverState(False, Winner.UNKNOWN)
 
 
-if (__name__ == '__main__'):
+if __name__ == '__main__':
     ComputerStrategyBuilder(FILENAME).build()
