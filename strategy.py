@@ -1,9 +1,9 @@
 import abc
+import pickle
 from collections import deque
 from enum import Enum
 from typing import NamedTuple
 from pathlib import Path
-
 from game_play_state import GamePlayState
 
 EMPTY_SIGN = "-"
@@ -26,14 +26,6 @@ class BasicStrategyBuilder:
         return BasicStrategy()
 
 
-class ComputerStrategy(Strategy):
-    def __init__(self):
-        self.data = []
-
-    def step(self, board: GamePlayState.GameBoard) -> tuple[int,int]:
-        return (0,0) # TODO write logic for stepping
-
-
 class Winner(Enum):
     UNKNOWN = "UNKNOWN"
     X = "X"
@@ -48,8 +40,15 @@ class StrategyNode:
         self.strategy: Winner = strategy
 
 
-class ComputerStrategyBuilder:
+class ComputerStrategy(Strategy):
+    def __init__(self, data: dict[str, StrategyNode]):
+        self.data = data
 
+    def step(self, board: GamePlayState.GameBoard) -> tuple[int,int]:
+        return (0,0) # TODO write logic for stepping
+
+
+class ComputerStrategyBuilder:
     class GameOverState(NamedTuple):
         is_gameover: bool
         winner: Winner
@@ -59,21 +58,20 @@ class ComputerStrategyBuilder:
 
     def build(self) -> Strategy:
         if self.file.exists():
-            # TODO load strategy from file
-            ...
+            with open(self.file, "rb+") as f:
+                strategy = pickle.load(f)
+            return strategy
         else:
             strategy = self.build_strategy()
-            with open(self.file, "w+") as f:
-                f.write(repr(strategy.data))
+            with open(self.file, "wb+") as f:
+                pickle.dump(strategy, f)
             return strategy
 
     def build_strategy(self) -> ComputerStrategy:
         states_to_evaluate = [[EMPTY_SIGN] * 9]
         computed_state_graph = self.compute_states_with_children(states_to_evaluate)
         computed_strategy_graph = self.compute_strategy_with_children(computed_state_graph)
-        strat = ComputerStrategy()
-        strat.data = {k[0]:f"(s={k[1].strategy} c={k[1].children}" for k in computed_strategy_graph.items()} # TODO set in ctor
-        return strat
+        return ComputerStrategy(computed_strategy_graph)
 
     def compute_states_with_children(self, states_to_evaluate: list[list[str]]) -> list[StrategyNode]:
         computed_states = []
