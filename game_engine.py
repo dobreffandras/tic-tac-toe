@@ -1,5 +1,7 @@
 from enum import Enum
 from collections.abc import Callable
+from typing import Optional
+
 from computer_player import ComputerPlayer
 from game_play_state import GamePlayState, GameTurn
 from strategy import Strategy, Difficulty
@@ -17,7 +19,7 @@ class GameEngine:
         self.playing_state_listener = None
         self.player_sign = None
         self.listener = gamestate_listener
-        self.playing_state = None
+        self.playing_state : Optional[GamePlayState] = None
         self.gameover_state = None
         self.computer_player = None
 
@@ -41,7 +43,8 @@ class GameEngine:
         # Receive players move
         self.playing_state.add_sign_to((r, c), self.player_sign)
         if winner_sign := self.playing_state.is_gameover():
-            self.gameover_state = {"board": self.playing_state.board.items(), "winner": winner_sign}
+            winner = winner_sign if winner_sign != True else None
+            self.gameover_state = {"board": self.playing_state.board.items(), "winner": winner}
             self.listener(GameState.GAMEOVER)
             return
         else:

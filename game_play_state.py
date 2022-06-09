@@ -1,5 +1,6 @@
 from enum import Enum
 import itertools
+from typing import Union
 
 
 class GameTurn(Enum):
@@ -54,8 +55,8 @@ BOARD:
     def change_turn(self, turn: GameTurn):
         self.turn = turn
 
-    def is_gameover(self):
-        def does_someone_win():
+    def is_gameover(self) -> Union[bool, str]:
+        def does_someone_win() -> Union[bool, str]:
             def signs_in_a_row():
                 is_row1 = self.board[(0, 0)] == self.board[(0, 1)] \
                     and self.board[(0, 1)] == self.board[(0, 2)] \
