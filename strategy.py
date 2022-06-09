@@ -44,6 +44,14 @@ class ComputerStrategy(Strategy):
         self.data : dict[str, StrategyNode] = data
 
     def step(self, board: GamePlayState.GameBoard, sign: str) -> tuple[int,int]:
+        def choose_from_possibilities(*, winning, not_loosing, loosing):
+            if len(winning):
+                return choice(winning)
+            elif len(not_loosing):
+                return choice(not_loosing)
+            else:
+                return choice(loosing)
+
         state = self.create_state_from_board(board)
         next_states = self.compute_next_states(state, sign)
         x_winners = [next_states[n] for n in next_states if self.data[n].strategy == Winner.X]
@@ -51,22 +59,10 @@ class ComputerStrategy(Strategy):
         both_winners = [next_states[n] for n in next_states if self.data[n].strategy == Winner.BOTH]
 
         if sign == X_SIGN:
-            if len(x_winners):
-                return choice(x_winners)
-            elif len(both_winners):
-                return choice(both_winners)
-            else:
-                return choice(o_winners)
+            return choose_from_possibilities(winning=x_winners, not_loosing=both_winners, loosing=o_winners)
 
         if sign == O_SIGN:
-            if len(o_winners):
-                return choice(o_winners)
-            elif len(both_winners):
-                return choice(both_winners)
-            else:
-                return choice(x_winners)
-
-        return (0,0) # TODO write logic for stepping
+            return choose_from_possibilities(winning=o_winners, not_loosing=both_winners, loosing=x_winners)
 
     def create_state_from_board(self, board : GamePlayState.GameBoard):
         signs = [board[(r,c)] for r in range(3) for c in range(3)]
