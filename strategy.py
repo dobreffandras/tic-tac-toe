@@ -32,9 +32,10 @@ class Winner(Enum):
 
 
 class StrategyNode:
-    def __init__(self, key: str, children: list[str], strategy: Winner = Winner.UNKNOWN):
+    def __init__(self, key: str, children: list[str], on_turn: str, strategy: Winner = Winner.UNKNOWN):
         self.key: str = key
         self.children: list[str] = children
+        self.on_turn = on_turn
         self.strategy: Winner = strategy
 
 
@@ -46,7 +47,7 @@ class ComputerStrategy(Strategy):
         state = self.create_state_from_board(board)
         next_states = self.compute_next_states(state, sign)
         grouped = groupby([self.data[n] for n in next_states], lambda k: k.strategy)
-        print(grouped)
+        print([(w, [s.key for s in g]) for w, g in grouped])
         return (0,0) # TODO write logic for stepping
 
     def create_state_from_board(self, board : GamePlayState.GameBoard):
@@ -112,7 +113,7 @@ class ComputerStrategyBuilder:
                         children.append(s)
 
             children_keys = [''.join(c) for c in children]
-            computed_states.append(StrategyNode(state_key, children_keys, gameover_state.winner))
+            computed_states.append(StrategyNode(state_key, children_keys, sign, gameover_state.winner))
         return computed_states
 
     def compute_strategy_with_children(self, computed_state_graph: list[StrategyNode]):
@@ -127,7 +128,7 @@ class ComputerStrategyBuilder:
             children_strategies = [strategy_graph[c].strategy for c in children]
 
             if all([x is not Winner.UNKNOWN for x in children_strategies]):
-                strategy = self.calculate_strategy_from_children(children_strategies)
+                strategy = self.calculate_strategy_from_children(children_strategies, node.on_turn)
                 strategy_graph[key].strategy = strategy
             else:
                 for c in children:
@@ -137,20 +138,28 @@ class ComputerStrategyBuilder:
                     nodes_to_calculate.append(node) # Need to recalculate current node later
         return strategy_graph
 
-    def calculate_strategy_from_children(self, children_strategies : list[Winner]):
+    def calculate_strategy_from_children(self, children_strategies : list[Winner], on_turn: str):
         x_win_strategy = any([s is Winner.X for s in children_strategies])
         o_win_strategy = any([s is Winner.O for s in children_strategies])
         both_win_strategy = any([s is Winner.BOTH for s in children_strategies])
 
-        if both_win_strategy:
+        if not x_win_strategy and not o_win_strategy:
             return Winner.BOTH
         if x_win_strategy and o_win_strategy:
-            return Winner.BOTH
-        if x_win_strategy:
-            return Winner.X
-        if o_win_strategy:
-            return Winner.O
-        return Winner.UNKNOWN
+            if on_turn == X_SIGN:
+                return Winner.X
+            if on_turn == O_SIGN:
+                return Winner.O
+        if x_win_strategy and not o_win_strategy:
+            if on_turn == O_SIGN and both_win_strategy:
+                return Winner.BOTH
+            else:
+                return Winner.X
+        if o_win_strategy and not x_win_strategy:
+            if on_turn == X_SIGN and both_win_strategy:
+                return Winner.BOTH
+            else:
+                return Winner.O
 
     def gameover_state(self, board: str) -> GameOverState:
         def board_is_full():
