@@ -7,6 +7,8 @@ from typing import NamedTuple, Optional, Generator
 from pathlib import Path
 from game_play_state import GamePlayState
 
+FILENAME = "computer.strategy"
+
 EMPTY_SIGN = "-"
 X_SIGN = "X"
 O_SIGN = "O"
@@ -186,4 +188,4 @@ class ComputerStrategyBuilder:
         return ComputerStrategyBuilder.GameOverState(False, Winner.UNKNOWN)
 
 if (__name__ == '__main__'):
-    ComputerStrategyBuilder("computer.strategy").build() # TODO extract magic constant
+    ComputerStrategyBuilder(FILENAME).build()
