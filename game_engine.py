@@ -2,7 +2,7 @@ from enum import Enum
 from collections.abc import Callable
 from computer_player import ComputerPlayer
 from game_play_state import GamePlayState, GameTurn
-from strategy import Strategy
+from strategy import Strategy, Difficulty
 
 
 class GameState(Enum):
@@ -27,7 +27,7 @@ class GameEngine:
     def start_playing(self, player_sign: str):
         self.player_sign = player_sign
         computer_player_sign = "O" if player_sign == "X" else "X"
-        self.computer_player = ComputerPlayer(self.computer_strategy, computer_player_sign)
+        self.computer_player = ComputerPlayer(self.computer_strategy, computer_player_sign, Difficulty.HARD)
         self.playing_state = GamePlayState(GameTurn.PLAYER if player_sign == "X" else GameTurn.COMPUTER)
         self.listener(GameState.PLAYING)
 
