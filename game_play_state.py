@@ -27,8 +27,6 @@ BOARD:
         def __init__(self):
             self.board = [[None, None, None], [None, None, None], [None, None, None]]
 
-        # TODO implement repr especially because we want to save-retrieve game state
-
         def __str__(self):
             def to_char(f):
                 return f if f is not None else "-"
