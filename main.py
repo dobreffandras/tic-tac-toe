@@ -1,3 +1,19 @@
 from game import Game
+from strategy import ComputerStrategyBuilder, BasicStrategy
+import strategy
 
-Game("computer.strategy").launch()
+# classes in saved computer.strategy file must be loaded into the __main__ namespace
+module_dict = globals()
+module_dict["ComputerStrategy"] = strategy.ComputerStrategy
+module_dict["StrategyNode"] = strategy.StrategyNode
+module_dict["Winner"] = strategy.Winner
+
+loaded_strategy = ComputerStrategyBuilder("computer.strategy").load()
+if(loaded_strategy) :
+    print("Computer is playing with winning strategy.")
+    Game(loaded_strategy).launch()
+else:
+    print("Computer is playing with basic strategy.")
+    Game(BasicStrategy()).launch()
+
+

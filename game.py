@@ -2,12 +2,13 @@ from game_engine import GameEngine, GameState
 from game_play_state import GamePlayState, GameTurn
 from tkinter import Tk, Frame, Label, Button, Radiobutton, PhotoImage, StringVar, NORMAL, DISABLED, CENTER
 import threading
+from strategy import Strategy
 
 
 class Game(Tk):
-    def __init__(self, computer_strategy_file_path: str):
+    def __init__(self, computer_strategy: Strategy):
         super().__init__()
-        self.game_engine = GameEngine(self.gamestate_change_handler, computer_strategy_file_path)
+        self.game_engine = GameEngine(self.gamestate_change_handler, computer_strategy)
         self.title("Tic tac toe")
         self.geometry("250x320")
 
