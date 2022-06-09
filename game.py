@@ -1,8 +1,8 @@
 from game_engine import GameEngine, GameState
 from game_play_state import GamePlayState, GameTurn
-from tkinter import Tk, Frame, Label, Button, Radiobutton, PhotoImage, StringVar, NORMAL, DISABLED, CENTER
+from tkinter import Tk, Frame, Label, Button, Radiobutton, PhotoImage, StringVar, NORMAL, DISABLED, CENTER, IntVar
 import threading
-from strategy import Strategy
+from strategy import Strategy, Difficulty
 
 
 class Game(Tk):
@@ -98,10 +98,13 @@ class Game(Tk):
     class Start:
         def __init__(self, tk_root, engine: GameEngine):
             self.player_sign_tkvar = StringVar(value="X")
+            self.difficulty_tkvar = IntVar(value=3)
             self.frame = None
             self.welcome_label = None
+            self.choose_difficulty_label = None
             self.note_label = None
             self.sign_chooser_buttons = []
+            self.difficulty_chooser_buttons = []
             self.game_start_button = None
             self.tk_root = tk_root
             self.engine = engine
@@ -111,9 +114,15 @@ class Game(Tk):
         def setup_controls(self):
             self.frame = Frame(self.tk_root)
             self.welcome_label = Label(self.frame, text="Choose a sign:", font=("Courier", "12"))
+            self.choose_difficulty_label = Label(self.frame, text="Choose difficulty:", font=("Courier", "12"))
             self.sign_chooser_buttons = [
                 Radiobutton(self.frame, text="X", value="X", variable=self.player_sign_tkvar),
                 Radiobutton(self.frame, text="O", value="O", variable=self.player_sign_tkvar)
+            ]
+            self.difficulty_chooser_buttons = [
+                Radiobutton(self.frame, text="Easy", value=1, variable=self.difficulty_tkvar),
+                Radiobutton(self.frame, text="Medium", value=2, variable=self.difficulty_tkvar),
+                Radiobutton(self.frame, text="Hard", value=3, variable=self.difficulty_tkvar),
             ]
             self.note_label = Label(self.frame, text="Note: X is the first player", font=("Arial", "10", "italic"))
             self.game_start_button = Button(self.frame,
@@ -121,7 +130,11 @@ class Game(Tk):
                                             command=self.create_start_button_command())
 
         def create_start_button_command(self):
-            thread = threading.Thread(target=lambda: self.engine.start_playing(self.player_sign_tkvar.get()))
+            def start():
+                player_sign = self.player_sign_tkvar.get()
+                difficulty = Difficulty(self.difficulty_tkvar.get())
+                self.engine.start_playing(player_sign, difficulty)
+            thread = threading.Thread(target=start)
             return thread.start
 
         def layout_controls(self):
@@ -130,6 +143,10 @@ class Game(Tk):
             self.sign_chooser_buttons[0].pack(pady=(5, 0))
             self.sign_chooser_buttons[1].pack(pady=(0, 5))
             self.note_label.pack(pady=(5, 15))
+            self.choose_difficulty_label.pack()
+            self.difficulty_chooser_buttons[0].pack(pady=(0, 5))
+            self.difficulty_chooser_buttons[1].pack()
+            self.difficulty_chooser_buttons[2].pack(pady=(0, 15))
             self.game_start_button.pack()
 
     class GameOver:

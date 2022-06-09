@@ -24,10 +24,10 @@ class GameEngine:
     def launch(self):
         self.listener(GameState.START)
 
-    def start_playing(self, player_sign: str):
+    def start_playing(self, player_sign: str, difficulty: Difficulty):
         self.player_sign = player_sign
         computer_player_sign = "O" if player_sign == "X" else "X"
-        self.computer_player = ComputerPlayer(self.computer_strategy, computer_player_sign, Difficulty.HARD)
+        self.computer_player = ComputerPlayer(self.computer_strategy, computer_player_sign, difficulty)
         self.playing_state = GamePlayState(GameTurn.PLAYER if player_sign == "X" else GameTurn.COMPUTER)
         self.listener(GameState.PLAYING)
 
