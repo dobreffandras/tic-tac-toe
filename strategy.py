@@ -46,8 +46,26 @@ class ComputerStrategy(Strategy):
     def step(self, board: GamePlayState.GameBoard, sign: str) -> tuple[int,int]:
         state = self.create_state_from_board(board)
         next_states = self.compute_next_states(state, sign)
-        grouped = groupby([self.data[n] for n in next_states], lambda k: k.strategy)
-        print([(w, [s.key for s in g]) for w, g in grouped])
+        x_winners = [next_states[n] for n in next_states if self.data[n].strategy == Winner.X]
+        o_winners = [next_states[n] for n in next_states if self.data[n].strategy == Winner.O]
+        both_winners = [next_states[n] for n in next_states if self.data[n].strategy == Winner.BOTH]
+
+        if sign == X_SIGN:
+            if len(x_winners):
+                return x_winners[0]
+            elif len(both_winners):
+                return both_winners[0]
+            else:
+                return o_winners[0]
+
+        if sign == O_SIGN:
+            if len(o_winners):
+                return o_winners[0]
+            elif len(both_winners):
+                return both_winners[0]
+            else:
+                return x_winners[0]
+
         return (0,0) # TODO write logic for stepping
 
     def create_state_from_board(self, board : GamePlayState.GameBoard):
@@ -55,13 +73,14 @@ class ComputerStrategy(Strategy):
         converted_signs = [x if x == X_SIGN or x == O_SIGN else EMPTY_SIGN for x in signs]
         return ''.join(converted_signs)
 
-    def compute_next_states(self, state: str, sign: str) -> list[str]:
-        next_states = []
+    def compute_next_states(self, state: str, sign: str) -> dict[str, tuple[int, int]]:
+        next_states = {}
         for i in range(9):
             if state[i] is EMPTY_SIGN:
                 s = [*state]
                 s[i] = sign
-                next_states.append(''.join(s))
+                index = divmod(i, 3)
+                next_states[''.join(s)]= index
         return next_states
 
 
