@@ -165,4 +165,5 @@ class ComputerStrategyBuilder:
             return ComputerStrategyBuilder.GameOverState(True, Winner.BOTH)
         return ComputerStrategyBuilder.GameOverState(False, Winner.UNKNOWN)
 
-ComputerStrategyBuilder("local.strategy").build() # Just for testing purposes
+if (__name__ == '__main__'):
+    ComputerStrategyBuilder("computer.strategy").build() # TODO extract magic constant
