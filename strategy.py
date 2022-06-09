@@ -39,10 +39,10 @@ class Winner(Enum):
 
 
 class StrategyNode:
-    def __init__(self, key: str, children: list[str]):
+    def __init__(self, key: str, children: list[str], strategy: Winner = Winner.UNKNOWN):
         self.key: str = key
         self.children: list[str] = children
-        self.strategy: Winner = Winner.UNKNOWN
+        self.strategy: Winner = strategy
 
 
 class ComputerStrategyBuilder:
@@ -72,20 +72,24 @@ class ComputerStrategyBuilder:
         strat.data = {k[0]:f"(s={k[1].strategy} c={k[1].children}" for k in computed_strategy_graph.items()} # TODO set in ctor
         return strat
 
-    def compute_states_with_children(self, states_to_evaluate) -> list[StrategyNode]:
+    def compute_states_with_children(self, states_to_evaluate: list[list[str]]) -> list[StrategyNode]:
         computed_states = []
         while len(states_to_evaluate):
             state = states_to_evaluate.pop()
             children = []
             sign = "X" if state.count("X") == state.count("O") else "O"
-            for i in range(0, 9):
-                s = state.copy()  # for not overwriting the state
-                if (s[i] == "-"):
-                    s[i] = sign
-                    states_to_evaluate.append(s)
-                    children.append(s)
+            state_key = ''.join(state)
+            gameover_state = self.gameover_state(state_key)
+            if not gameover_state.is_gameover:
+                for i in range(0, 9):
+                    s = state.copy()  # for not overwriting the state
+                    if (s[i] == "-"):
+                        s[i] = sign
+                        states_to_evaluate.append(s)
+                        children.append(s)
 
-            computed_states.append(StrategyNode(''.join(state), [''.join(c) for c in children]))
+            children_keys = [''.join(c) for c in children]
+            computed_states.append(StrategyNode(state_key, children_keys, gameover_state.winner))
         return computed_states
 
     def compute_strategy_with_children(self, computed_state_graph: list[StrategyNode]):
@@ -98,10 +102,8 @@ class ComputerStrategyBuilder:
             key = node.key
             children = strategy_graph[key].children
             children_strategies = [strategy_graph[c].strategy for c in children]
-            game_over = self.gameover_state(key)
-            if game_over.is_gameover:
-                strategy_graph[key].strategy = game_over.winner
-            elif all([x is not Winner.UNKNOWN for x in children_strategies]):
+
+            if all([x is not Winner.UNKNOWN for x in children_strategies]):
                 strategy = self.calculate_strategy_from_children(children_strategies)
                 strategy_graph[key].strategy = strategy
             else:
