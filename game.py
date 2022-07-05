@@ -6,6 +6,12 @@ from strategy import Strategy, Difficulty
 
 
 class Game(Tk):
+    """
+    It's a subclass of Tkinter.Tk enabling the creation of GUI elements.
+    This class scaffold for the game stages (Start, Playing, GameOver).
+    It handles the game state changes coming from the GameEngine by instantiating
+    the appropriate nested GUI class for the current stage.
+    """
     def __init__(self, computer_strategy: Strategy):
         super().__init__()
         self.game_engine = GameEngine(self.gamestate_change_handler, computer_strategy)
@@ -28,6 +34,12 @@ class Game(Tk):
         self.mainloop()
 
     class Playing:
+        """
+        This class represents the GUI for the game when the player actually plays the game.
+        It sends the moves of the user to the GameEngine and updates the UI based on game state changes
+        with the help of the playing_state_changed callback method.
+        The class creates a grid of buttons and text indicating the player on turn.
+        """
 
         turn_indicator_config = {
             "player": dict(text="It's your turn.", font=("Courier", "12", "bold"), bg="#0F0"),
@@ -96,6 +108,10 @@ class Game(Tk):
                 btn.config(image=self.images[btn_image], state=btn_state)
 
     class Start:
+        """
+        This class represents the GUI for the game welcome screen. It creates some radio buttons and a Start button.
+        The start button starts the game using the GameEngine instance with the selected settings.
+        """
         def __init__(self, tk_root, engine: GameEngine):
             self.player_sign_tkvar = StringVar(value="X")
             self.difficulty_tkvar = IntVar(value=3)
@@ -151,6 +167,11 @@ class Game(Tk):
             self.game_start_button.pack()
 
     class GameOver:
+        """
+        This class represents the GUI for the game over stage. It creates a grid of buttons with the last board state,
+        a text about the result and a replay button.
+        The replay button restarts the game using the GameEngine instance.
+        """
         def __init__(self, tk_root, engine: GameEngine):
             self.game_over_label = None
             self.tk_root = tk_root

@@ -21,17 +21,26 @@ class Difficulty(Enum):
 
 
 class Strategy(abc.ABC):
+    """
+    This is the base class for the different strategies used by the ComputerPlayer
+    """
     @abc.abstractmethod
     def step(self, board: GamePlayState.GameBoard, sign: str, difficulty: Difficulty) -> tuple[int, int]:
         pass
 
 
 class BasicStrategy(Strategy):
+    """
+    The basic strategy will always yield the next available field as the step of the computer opponent
+    """
     def step(self, board: GamePlayState.GameBoard, sign: str, difficulty: Difficulty) -> tuple[int, int]:
         return next((move for (move, val) in board.items() if val is None))
 
 
 class Winner(Enum):
+    """
+    This Enum indicates which player can win from the current board setup.
+    """
     UNKNOWN = "UNKNOWN"
     X = "X"
     O = "O"
@@ -39,6 +48,12 @@ class Winner(Enum):
 
 
 class StrategyNode:
+    """
+    This class represents a node in the gamestate graph. (e.g. the initial node is the empty field with the X being on turn.)
+    The children of a node are the gamestates that are reachable from the
+    current one. (e.g. from the initial node all nodes that have only one X are children.)
+    The key is the string representation of the board. The strategy represents which player can win from this state.
+    """
     def __init__(self, key: str, children: list[str], on_turn: str, strategy: Winner = Winner.UNKNOWN):
         self.key: str = key
         self.children: list[str] = children
@@ -47,10 +62,18 @@ class StrategyNode:
 
 
 class ComputerStrategy(Strategy):
+    """
+    This strategy will choose step based on the strategy graph (data) and difficulty.
+    """
     def __init__(self, data: dict[str, StrategyNode]):
         self.data: dict[str, StrategyNode] = data
 
     def step(self, board: GamePlayState.GameBoard, sign: str, difficulty: Difficulty) -> tuple[int, int]:
+        """
+        This method will choose the next step of the computer player based on the current board, the strategy graph and difficulty.
+        The difficulty defines how the next step will be chosen. On HARD the children are filtered only for the best possible scenario.
+        On MEDIUM difficulty natural choices are also possible. On EASY the strategy chooses actually randomly.
+        """
         def choose_from_possibilities(*, best, natural, worst):
             if len(best):
                 return choice(best)
@@ -100,6 +123,9 @@ class ComputerStrategy(Strategy):
 
 
 class ComputerStrategyBuilder:
+    """
+    This class can build up, save and load a strategy graph to/from file.
+    """
     class GameOverState(NamedTuple):
         is_gameover: bool
         winner: Winner
@@ -124,12 +150,24 @@ class ComputerStrategyBuilder:
             return None
 
     def build_strategy(self) -> ComputerStrategy:
+        """
+        This method builds up the strategy graph
+        :return: the strategy graph
+        """
         states_to_evaluate = [[EMPTY_SIGN] * 9]
         computed_state_graph = self.compute_states_with_children(states_to_evaluate)
         computed_strategy_graph = self.compute_strategy_with_children(computed_state_graph)
         return ComputerStrategy(computed_strategy_graph)
 
     def compute_states_with_children(self, states_to_evaluate: list[list[str]]) -> list[StrategyNode]:
+        """
+        This method creates a list of strategy nodes which represent a possible state of the game.
+
+        The algorithm pops one node from a queue and creates its children which are added to the queue as well.
+        "game over" nodes are marked with the winner.
+        The algorithm stops when queue becomes empty.
+        :param states_to_evaluate: The list of initial nodes. This should be a list with the initial node.
+        """
         computed_states = []
         while len(states_to_evaluate):
             state = states_to_evaluate.pop()
@@ -150,6 +188,15 @@ class ComputerStrategyBuilder:
         return computed_states
 
     def compute_strategy_with_children(self, computed_state_graph: list[StrategyNode]):
+        """
+        This method calculates the potential winners in the intermediate game states of the state graph
+        The method uses a deque to keep track of the nodes to be evaluated. If a node has UNKNOWN strategy
+        the strategy is calculated from its children (if they are already have). If the children also require calculation
+        they are pushed to the deque.
+        The algorithm stops once the deque is empty.
+        :param computed_state_graph: the already built state graph that only needs strategy evaluation in the nodes.
+        :return: A state graph that has an evaluated strategy for all nodes.
+        """
         strategy_graph: dict[str, StrategyNode] = {g.key: g for g in computed_state_graph}
         nodes_to_calculate: deque[StrategyNode] = deque([strategy_graph[EMPTY_SIGN * 9]])
         while len(nodes_to_calculate):
@@ -196,6 +243,10 @@ class ComputerStrategyBuilder:
                 return Winner.O
 
     def gameover_state(self, board: str) -> GameOverState:
+        """
+        Determines whether the current board is a game over state. (either a player wins or the board is full)
+        :return A GameOverState that has boolean (whether is a gameover state or not) and an optional winner.
+        """
         def board_is_full():
             return board.count(EMPTY_SIGN) == 0
 

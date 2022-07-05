@@ -14,6 +14,14 @@ class GameState(Enum):
 
 
 class GameEngine:
+    """
+    This class represents the core functionality of the game. The engine can be driven by its methods
+    like launch, start_playing, player_chooses and restart.
+    It operates with two callback functions. One of them is the gamestate_listener. The engine calls this on game stage changes.
+    The other is the playing_state_listener. This can be registered using the connect_playing_state_change_handler method.
+    The playing_state_listener callback function is only used in the Playing stage. This will be called on
+    every game state change (e.g. Player or opponent did a move).
+    """
     def __init__(self, gamestate_listener: Callable[[GameState], None], computer_strategy: Strategy):
         self.computer_strategy = computer_strategy
         self.playing_state_listener = None

@@ -10,5 +10,5 @@ class ComputerPlayer:
         self.difficulty = difficulty
 
     def next_move(self, board: GamePlayState.GameBoard) -> tuple[int, int]:
-        sleep(1 / 3)
+        sleep(1 / 3) # just for emulating the thinking of the computer
         return self.strategy.step(board, self.sign, self.difficulty)

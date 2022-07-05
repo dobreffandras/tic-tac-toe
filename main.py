@@ -3,6 +3,7 @@ from strategy import ComputerStrategyBuilder, BasicStrategy
 import strategy
 
 # classes in saved computer.strategy file must be loaded into the __main__ namespace
+# because deserialization only detects classes in the correct namespace
 module_dict = globals()
 module_dict["ComputerStrategy"] = strategy.ComputerStrategy
 module_dict["StrategyNode"] = strategy.StrategyNode
